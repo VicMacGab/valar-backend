@@ -10,8 +10,10 @@
     "outDir": "dist",
     "baseUrl": "./",
     "paths": {
-      "*": ["node_modules/*"]
+      "*": ["node_modules/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@services/*": ["src/services/*"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*", "index.ts", "app.ts"]
 }

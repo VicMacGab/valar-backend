@@ -1,5 +1,5 @@
 import express, { Request, Response, Router } from "express";
-import helloService from "../services/helloService";
+import helloService from "@services/helloService";
 
 const helloController: Router = express.Router();
 
