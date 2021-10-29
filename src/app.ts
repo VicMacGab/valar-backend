@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import helloController from "@controllers/helloController";
+import helloController from "./controllers/helloController";
 const cors = require("cors");
 
 const api: express.Express = express();
