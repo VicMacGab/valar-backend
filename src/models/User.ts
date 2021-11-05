@@ -13,7 +13,7 @@ const UserSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Chat",
       },
-      key: String,
+      key: Schema.Types.Buffer,
     },
   ],
   outgoingRequests: [
