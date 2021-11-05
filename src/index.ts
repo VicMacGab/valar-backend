@@ -1,19 +1,18 @@
 import api from "./app";
 import mongoose from "mongoose";
 
-const port: number = 5000;
+const dotenv = require("dotenv");
+const dotenvExpand = require("dotenv-expand");
 
-// TODO: .env
+dotenvExpand(dotenv.config());
 
 mongoose
-  .connect(
-    "mongodb+srv://gambo:YxFLW9H7LQC7EdIa@valar.edrdc.mongodb.net/valar?retryWrites=true&w=majority"
-  )
+  .connect(process.env.DB_URL!)
   .then(() => {
     console.log("sucessfully connected to mongo db :)");
-    api.listen(port, () => {
+    api.listen(process.env.PORT, () => {
       console.log("Server Ready 😎");
-      console.log(`Listening on: localhost:${port}`);
+      console.log(`Listening on: localhost:${process.env.PORT}`);
     });
   })
   .catch((err) => {
