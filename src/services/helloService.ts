@@ -1,7 +1,11 @@
-const helloService: any = {};
+interface HelloService {
+  getMessage: () => void;
+}
 
-helloService.getMessage = () => {
-  return { msg: "Hello." };
+const helloService: HelloService = {
+  getMessage: () => {
+    return { msg: "Hello." };
+  },
 };
 
 export default helloService;

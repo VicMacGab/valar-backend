@@ -1,8 +1,20 @@
 import express, { Request, Response } from "express";
+import cors from "cors";
+import pinoHttp from "pino-http";
+
 import helloController from "./controllers/helloController";
-const cors = require("cors");
+import userController from "./controllers/userController";
 
 const api: express.Express = express();
+
+// esto loggea cada incoming request y outgoing response
+api.use(
+  pinoHttp({
+    transport: {
+      target: "pino-pretty",
+    },
+  })
+);
 
 // for parsing application/json
 api.use(
@@ -26,5 +38,6 @@ api.get("/api", (req: Request, res: Response) => {
 });
 
 api.use("/api", helloController);
+api.use("/api", userController);
 
 export default api;
