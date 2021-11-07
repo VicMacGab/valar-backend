@@ -31,7 +31,11 @@ api.use(
   })
 );
 
-api.use(cors());
+api.use(
+  cors({
+    origin: "*",
+  })
+);
 
 api.get("/api", (req: Request, res: Response) => {
   return res.status(418).json("Soy un teapot.");
