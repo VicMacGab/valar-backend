@@ -7,7 +7,6 @@ import User from "../models/User";
 
 import logger from "../services/logger";
 import userService from "../services/userService";
-import { models } from "mongoose";
 
 const userController: Router = express.Router();
 
@@ -18,7 +17,7 @@ const userController: Router = express.Router();
 
 // hacer services
 
-userController.post("/user", async (req: Request, res: Response) => {
+userController.post("/user/signup", async (req: Request, res: Response) => {
   try {
     const user = await User.findOne({
       $or: [{ username: req.body.username }, { email: req.body.email }],
@@ -26,10 +25,10 @@ userController.post("/user", async (req: Request, res: Response) => {
     if (user) {
       if (user.username == req.body.username) {
         logger.error("username conflict");
-        return res.status(409).json({ msg: USER.ERROR.USERNAMECONFLICT });
+        return res.status(409).json({ msg: USER.ERROR.USERNAME_CONFLICT });
       } else {
         logger.error("email conflict");
-        return res.status(409).json({ msg: USER.ERROR.EMAILCONFLICT });
+        return res.status(409).json({ msg: USER.ERROR.EMAIL_CONFLICT });
       }
     } else {
       userService
@@ -42,29 +41,54 @@ userController.post("/user", async (req: Request, res: Response) => {
         })
         .catch((err) => {
           logger.error("user creation", err);
-          return res.status(500).json({ msg: `${USER.ERROR.CREATION} ${err}` });
+          return res.status(500).json({ msg: USER.ERROR.CREATION, err });
         });
     }
   } catch (err) {
     logger.error("user search", err);
-    return res.status(500).json({ msg: `${USER.ERROR.GENERIC} ${err}` });
+    return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
   }
 });
 
 //TODO: crear índice hash en username
-userController.get("/user", (req: Request, res: Response) => {
-  if (!req.body.username) {
+userController.post("/user/signin", (req: Request, res: Response) => {
+  if (!req.query.username) {
     logger.error("user search");
-    return res.status(400).json({ msg: `${USER.ERROR.BADREQUEST}` });
+    return res.status(400).json({ msg: `${USER.ERROR.BAD_REQUEST}` });
   }
-  User.findOne({ username: req.body.username }, (err, user: UserDTO) => {
+  User.findOne(
+    { username: req.body.username },
+    "username verified",
+    (err, user: UserDTO) => {
+      if (err) {
+        logger.error("user search", err);
+        return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
+      } else {
+        if (!user) {
+          logger.error("user search");
+          return res.status(404).json({ msg: `${USER.ERROR.NOT_FOUND}` });
+        }
+        logger.info("user search", user);
+        return res.status(200).json({ msg: USER.SUCCESS.FOUND, user });
+      }
+    }
+  );
+});
+
+userController.get("/user/search/:username", (req: Request, res: Response) => {
+  const username = req.params.username;
+  if (!username) {
+    logger.error("user search");
+    return res.status(400).json({ msg: `${USER.ERROR.BAD_REQUEST}` });
+  }
+  User.findOne({ username: username }, "username", (err, user: UserDTO) => {
     if (err) {
       logger.error("user search", err);
-      return res.status(500).json({ msg: `${USER.ERROR.GENERIC} ${err}` });
+      return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
     } else {
       if (!user) {
         logger.error("user search");
-        return res.status(404).json({ msg: `${USER.ERROR.NOTFOUND}` });
+        return res.status(404).json({ msg: `${USER.ERROR.NOT_FOUND}` });
       }
       logger.info("user search", user);
       return res.status(200).json({ msg: USER.SUCCESS.FOUND, user });

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { MessageDTO } from "../utils/dtos/message";
 
 // schema = los tipos de dato de cada fila
 // collection = tabla
@@ -6,7 +7,7 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const MessageSchema = new Schema({
+const MessageSchema = new Schema<Partial<MessageDTO>>({
   content: String,
   idFrom: {
     type: Schema.Types.ObjectId,

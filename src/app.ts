@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import pinoHttp from "pino-http";
 
@@ -6,6 +6,13 @@ import helloController from "./controllers/helloController";
 import userController from "./controllers/userController";
 
 const api: express.Express = express();
+
+// si no hago esto, sabrán que estamos usando Express
+// 'X-Powered-By' sería igual a 'Express'
+api.use((req: Request, res: Response, next: NextFunction) => {
+  res.setHeader("x-powered-by", "Sapaso");
+  next();
+});
 
 // esto loggea cada incoming request y outgoing response
 api.use(
@@ -16,14 +23,14 @@ api.use(
   })
 );
 
-// for parsing application/json
+// for parsing body con application/json
 api.use(
   express.json({
     limit: "50mb",
   })
 );
 
-// for parsing application/x-www-form-urlencoded
+// for parsing body con application/x-www-form-urlencoded
 api.use(
   express.urlencoded({
     extended: true,
@@ -31,6 +38,7 @@ api.use(
   })
 );
 
+// por ahora permitir requests de cualquier origen
 api.use(
   cors({
     origin: "*",

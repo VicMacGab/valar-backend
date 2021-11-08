@@ -1,4 +1,5 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { ChatDTO } from "../utils/dtos/chat";
 
 import MessageSchema from "./Message";
 
@@ -8,7 +9,7 @@ import MessageSchema from "./Message";
 
 const Schema = mongoose.Schema;
 
-const ChatSchema = new Schema({
+const ChatSchema = new Schema<Partial<ChatDTO>>({
   idUser1: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -20,5 +21,5 @@ const ChatSchema = new Schema({
   messages: [MessageSchema],
 });
 
-const Chat = mongoose.model("Chat", ChatSchema);
+const Chat: Model<Partial<ChatDTO>> = mongoose.model("Chat", ChatSchema);
 export default Chat;

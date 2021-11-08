@@ -1,11 +1,12 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
+import { UserDTO } from "../utils/dtos/user";
 
 const Schema = mongoose.Schema;
 
-const UserSchema = new Schema({
-  username: {type: String, required: true},
-  password: {type: String, required: true},
-  email: {type: String, required: true},
+const UserSchema = new Schema<UserDTO>({
+  username: { type: String, required: true },
+  password: { type: String, required: true },
+  email: { type: String, required: true },
   verified: Boolean,
   chats: [
     {
@@ -40,5 +41,6 @@ const UserSchema = new Schema({
   ],
 });
 
-const User = mongoose.model("User", UserSchema);
+const User: Model<UserDTO> = mongoose.model<UserDTO>("User", UserSchema);
+
 export default User;

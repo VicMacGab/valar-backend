@@ -1,14 +1,14 @@
 export const USER = {
   SUCCESS: {
     CREATION: "User created successfully!",
-    FOUND: "User found successfully!", 
+    FOUND: "User found successfully!",
   },
   ERROR: {
     CREATION: "Error when creating user.",
-    NOTFOUND: "User not found.",
-    BADREQUEST: "Required field username missing.",
-    USERNAMECONFLICT: "An account with that username already exists.",
-    EMAILCONFLICT: "An account with that email already exists.",
+    NOT_FOUND: "User not found.",
+    BAD_REQUEST: "Required field username missing.",
+    USERNAME_CONFLICT: "An account with that username already exists.",
+    EMAIL_CONFLICT: "An account with that email already exists.",
     GENERIC: "Error when searching user.",
   },
 };
