@@ -1,9 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import pinoHttp from "pino-http";
 
 import helloController from "./controllers/helloController";
 import userController from "./controllers/userController";
+import logger from "./services/logger";
 
 const api: express.Express = express();
 
@@ -15,13 +15,11 @@ api.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // esto loggea cada incoming request y outgoing response
-api.use(
-  pinoHttp({
-    transport: {
-      target: "pino-pretty",
-    },
-  })
-);
+// api.use((req, res, next) => {
+//   logger.request(req);
+//   logger.response(res);
+//   next();
+// });
 
 // for parsing body con application/json
 api.use(
@@ -39,6 +37,7 @@ api.use(
 );
 
 // por ahora permitir requests de cualquier origen
+// TODO: ver como hacemos esto
 api.use(
   cors({
     origin: "*",

@@ -7,15 +7,23 @@ import User from "../models/User";
 
 import logger from "../services/logger";
 import userService from "../services/userService";
+import { CallbackError } from "mongoose";
 
 const userController: Router = express.Router();
 
-// controller de login
+// TODO: debería ser /auth/signin y /auth/signup
 
-// 2 factor, mandar mail
-// hashear password
+// TODO: 2 factor (para confirmar mail en signup y loggear en signin) (nodemailer, setear una expiración al código)
 
-// hacer services
+// TODO: hashear el password con salt (con bcrypt)
+
+// TODO: crear índice hash en username (ya está, hay que probarlo)
+
+// TODO: hacer services (para que los controllers sean más legibles)
+
+// TODO: hacer un servicio que valide el shape de los req.body (le pasamos un objeto
+// TODO: que describe el shape (interfaz) que el req.body debería tener y si hay un mismatch
+// TODO: le deolvemos 400 (Bad request, body does not have correct shape o algún mensaje así)
 
 userController.post("/user/signup", async (req: Request, res: Response) => {
   try {
@@ -39,7 +47,7 @@ userController.post("/user/signup", async (req: Request, res: Response) => {
             .status(201)
             .json({ msg: USER.SUCCESS.CREATION, newUser: newUser });
         })
-        .catch((err) => {
+        .catch((err: CallbackError) => {
           logger.error("user creation", err);
           return res.status(500).json({ msg: USER.ERROR.CREATION, err });
         });
@@ -50,16 +58,15 @@ userController.post("/user/signup", async (req: Request, res: Response) => {
   }
 });
 
-//TODO: crear índice hash en username
 userController.post("/user/signin", (req: Request, res: Response) => {
-  if (!req.query.username) {
+  if (!req.body.username) {
     logger.error("user search");
     return res.status(400).json({ msg: `${USER.ERROR.BAD_REQUEST}` });
   }
   User.findOne(
     { username: req.body.username },
-    "username verified",
-    (err, user: UserDTO) => {
+    "username verified", // FIXME: outgoind requests, etc
+    (err: CallbackError, user: UserDTO) => {
       if (err) {
         logger.error("user search", err);
         return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
@@ -75,25 +82,30 @@ userController.post("/user/signin", (req: Request, res: Response) => {
   );
 });
 
+// para mandar solicitud
 userController.get("/user/search/:username", (req: Request, res: Response) => {
   const username = req.params.username;
   if (!username) {
     logger.error("user search");
     return res.status(400).json({ msg: `${USER.ERROR.BAD_REQUEST}` });
   }
-  User.findOne({ username: username }, "username", (err, user: UserDTO) => {
-    if (err) {
-      logger.error("user search", err);
-      return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
-    } else {
-      if (!user) {
-        logger.error("user search");
-        return res.status(404).json({ msg: `${USER.ERROR.NOT_FOUND}` });
+  User.findOne(
+    { username: username },
+    "username",
+    (err: CallbackError, user: UserDTO) => {
+      if (err) {
+        logger.error("user search", err);
+        return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
+      } else {
+        if (!user) {
+          logger.error("user search");
+          return res.status(404).json({ msg: `${USER.ERROR.NOT_FOUND}` });
+        }
+        logger.info("user search", user);
+        return res.status(200).json({ msg: USER.SUCCESS.FOUND, user });
       }
-      logger.info("user search", user);
-      return res.status(200).json({ msg: USER.SUCCESS.FOUND, user });
     }
-  });
+  );
 });
 
 export default userController;

@@ -4,9 +4,9 @@ import { UserDTO } from "../utils/dtos/user";
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema<UserDTO>({
-  username: { type: String, required: true },
+  username: { type: String, required: true, index: "hashed" },
   password: { type: String, required: true },
-  email: { type: String, required: true },
+  email: { type: String, required: true, index: "hashed" },
   verified: Boolean,
   chats: [
     {
@@ -30,9 +30,10 @@ const UserSchema = new Schema<UserDTO>({
   ],
   incomingRequests: [
     {
-      peerPrivatePart: Schema.Types.Buffer,
+      peerPrivatePart: Schema.Types.Buffer, // g^a mod p
       p: Schema.Types.Buffer,
       g: Schema.Types.Buffer,
+      // g^b mod p
       userId: {
         type: Schema.Types.ObjectId,
         ref: "User",
