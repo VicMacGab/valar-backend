@@ -7,7 +7,7 @@ const UserSchema = new Schema<UserDTO>({
   username: { type: String, required: true, index: "hashed" },
   password: { type: String, required: true },
   email: { type: String, required: true, index: "hashed" },
-  verified: Boolean,
+  verified: { type: Boolean, default:false},
   chats: [
     {
       chatId: {

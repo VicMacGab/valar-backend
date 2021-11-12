@@ -19,7 +19,7 @@ interface IncomingRequest {
 
 export interface UserDTO {
   username: string;
-  password: string;
+  password?: string;
   email: string;
   verified: boolean;
   chats: UserChat[];
