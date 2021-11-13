@@ -28,6 +28,12 @@ const userController: Router = express.Router();
 // TODO: que describe el shape (interfaz) que el req.body debería tener y si hay un mismatch
 // TODO: le deolvemos 400 (Bad request, body does not have correct shape o algún mensaje así)
 
+// TODO: no devolver el password
+
+// TODO: verified a false cuando haga logout (por el two-factor)
+
+// TODO: JWT en HTTP-ONLY & Secure cookie para guardar el username antes de que llene authCode
+
 userController.post("/user/signup", async (req: Request, res: Response) => {
   try {
     const user = await User.findOne(
@@ -38,7 +44,7 @@ userController.post("/user/signup", async (req: Request, res: Response) => {
     ).exec();
     if (user) {
       if (user.username == req.body.username) {
-        logger.error("username conflict");
+        logger.error("username conflict", req.body);
         return res.status(409).json({ msg: USER.ERROR.USERNAME_CONFLICT });
       } else {
         logger.error("email conflict");
@@ -162,6 +168,12 @@ userController.get("/user/search/:username", (req: Request, res: Response) => {
       }
     }
   );
+});
+
+userController.get("/user/log", (req: Request, res: Response) => {
+  logger.info("req.body");
+  logger.json(JSON.stringify(req.body, null, 2));
+  return res.status(200).json({ msg: "a" });
 });
 
 export default userController;

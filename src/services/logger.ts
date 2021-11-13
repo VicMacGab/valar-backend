@@ -5,7 +5,7 @@ const config = {
     error: 0,
     debug: 1,
     warn: 2,
-    data: 3,
+    json: 3,
     info: 4,
     request: 5,
     response: 6,
@@ -14,7 +14,7 @@ const config = {
     error: "red",
     debug: "blue",
     warn: "yellow",
-    data: "grey",
+    json: "grey",
     info: "green",
     request: "cyan",
     response: "magenta",
@@ -23,10 +23,15 @@ const config = {
 
 winston.addColors(config.colors);
 
-const logger: any = winston.createLogger({
+const myFormat = winston.format.printf((info) => {
+  return JSON.stringify(info, null, 2);
+});
+
+const logger: winston.Logger | any = winston.createLogger({
   levels: config.levels,
   format: winston.format.combine(
     // winston.format.prettyPrint(),
+    // myFormat,
     winston.format.colorize(),
     winston.format.simple()
   ),
