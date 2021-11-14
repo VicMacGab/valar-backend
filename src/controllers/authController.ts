@@ -1,20 +1,13 @@
 import express, { Request, Response, Router } from "express";
+import { compare } from "bcrypt";
 
 import { USER } from "../utils/constants/messages";
 import { UserDTO } from "../utils/dtos/user";
-
-import User from "../models/User";
+import { validBody } from "../utils/validation/body";
 
 import securityService from "../services/securityService";
-
 import logger from "../services/logger";
 import userService from "../services/userService";
-import { CallbackError } from "mongoose";
-
-import transporter from "../services/mailService";
-import codes from "../services/twoFactorService";
-import { randomInt } from "crypto";
-import { compare } from "bcrypt";
 
 const authController: Router = express.Router();
 
@@ -28,7 +21,15 @@ const authController: Router = express.Router();
 
 // TODO: JWT en HTTP-ONLY & Secure cookie para guardar el username antes de que llene authCode
 
+const signupKeys = ["username", "email", "password"];
+
 authController.post("/auth/signup", async (req: Request, res: Response) => {
+  if (!validBody(req.body, signupKeys)) {
+    return res
+      .status(400)
+      .json({ msg: "Correct shape is { username, email, password }" });
+  }
+
   try {
     const [found, username] = await userService.findByUsernameOrEmail(
       req.body.username,
@@ -64,10 +65,13 @@ authController.post("/auth/signup", async (req: Request, res: Response) => {
   }
 });
 
+const signinKeys = ["username", "password"];
+
 authController.post("/auth/signin", async (req: Request, res: Response) => {
-  if (!req.body.username) {
-    logger.error("user search");
-    return res.status(400).json({ msg: `${USER.ERROR.BAD_REQUEST}` });
+  if (!validBody(req.body, signinKeys)) {
+    return res
+      .status(400)
+      .json({ msg: "Correct shape is { username, password }" });
   }
 
   try {
