@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 
 import helloController from "./controllers/helloController";
+import authController from "./controllers/authController";
 import userController from "./controllers/userController";
 import logger from "./services/logger";
 import helmet from "helmet";
@@ -62,6 +63,7 @@ api.get("/api", (req: Request, res: Response) => {
 });
 
 api.use("/api", helloController);
+api.use("/api", authController);
 api.use("/api", userController);
 
 export default api;
