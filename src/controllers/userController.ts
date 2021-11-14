@@ -1,9 +1,9 @@
 import express, { Request, Response, Router } from "express";
 
 import logger from "../services/logger";
+import userService from "../services/userService";
 
 import { USER } from "../utils/constants/messages";
-import userService from "../services/userService";
 
 const userController: Router = express.Router();
 

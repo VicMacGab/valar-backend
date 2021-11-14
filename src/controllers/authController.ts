@@ -1,33 +1,26 @@
 import express, { Request, Response, Router } from "express";
 import { compare } from "bcrypt";
 
-import { USER } from "../utils/constants/messages";
-import { UserDTO } from "../utils/dtos/user";
-import { validBody } from "../utils/validation/body";
-
 import securityService from "../services/securityService";
 import logger from "../services/logger";
 import userService from "../services/userService";
+
+import { USER } from "../utils/constants/messages";
+import { AUTH } from "../utils/constants/general";
+import { UserDTO } from "../utils/dtos/user";
+import { validBody } from "../utils/validation/body";
 
 const authController: Router = express.Router();
 
 // TODO: 2 factor (para confirmar mail en signup y loggear en signin) (nodemailer, setear una expiración al código)
 
-// TODO: hacer un servicio que valide el shape de los req.body (le pasamos un objeto
-// TODO: que describe el shape (interfaz) que el req.body debería tener y si hay un mismatch
-// TODO: le deolvemos 400 (Bad request, body does not have correct shape o algún mensaje así)
-
 // TODO: verified a false cuando haga logout (por el two-factor)
 
 // TODO: JWT en HTTP-ONLY & Secure cookie para guardar el username antes de que llene authCode
 
-const signupKeys = ["username", "email", "password"];
-
 authController.post("/auth/signup", async (req: Request, res: Response) => {
-  if (!validBody(req.body, signupKeys)) {
-    return res
-      .status(400)
-      .json({ msg: "Correct shape is { username, email, password }" });
+  if (!validBody(req.body, AUTH.SIGNUP_KEYS)) {
+    return res.status(400).json({ msg: "IncorrectBody" });
   }
 
   try {
@@ -65,13 +58,9 @@ authController.post("/auth/signup", async (req: Request, res: Response) => {
   }
 });
 
-const signinKeys = ["username", "password"];
-
 authController.post("/auth/signin", async (req: Request, res: Response) => {
-  if (!validBody(req.body, signinKeys)) {
-    return res
-      .status(400)
-      .json({ msg: "Correct shape is { username, password }" });
+  if (!validBody(req.body, AUTH.SIGNIN_KEYS)) {
+    return res.status(400).json({ msg: "Incorrect body." });
   }
 
   try {
