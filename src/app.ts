@@ -1,16 +1,24 @@
-import express, { NextFunction, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
+import helmet from "helmet";
 
 import helloController from "./controllers/helloController";
 import authController from "./controllers/authController";
 import userController from "./controllers/userController";
+import cookieParser from "cookie-parser";
+
+const dotenv = require("dotenv");
+const dotenvExpand = require("dotenv-expand");
+
+dotenvExpand(dotenv.config());
 
 const api: express.Express = express();
 
-api.use((req: Request, res: Response, next: NextFunction) => {
-  res.setHeader("x-powered-by", "Sapaso");
-  next();
-});
+api.use(helmet());
+
+// TODO: geeks for geeks signed cookies
+// TODO: mailer
+// TODO: servicio que maneja todos los authcodes
 
 // esto loggea cada incoming request y outgoing response
 // api.use((req, res, next) => {
@@ -18,6 +26,15 @@ api.use((req: Request, res: Response, next: NextFunction) => {
 //   logger.response(res);
 //   next();
 // });
+
+// por ahora permitir requests de cualquier origen
+// TODO: ver como hacemos esto (la whitelist)
+api.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 // for parsing body con application/json
 api.use(
@@ -34,13 +51,8 @@ api.use(
   })
 );
 
-// por ahora permitir requests de cualquier origen
-// TODO: ver como hacemos esto (la whitelist)
-api.use(
-  cors({
-    origin: "*",
-  })
-);
+// para usar cookies firmadas
+api.use(cookieParser(process.env.COOKIES_SECRET));
 
 api.get("/api", (req: Request, res: Response) => {
   return res.status(418).json("Soy un teapot.");

@@ -1,11 +1,6 @@
 import api from "./app";
 import mongoose from "mongoose";
 
-const dotenv = require("dotenv");
-const dotenvExpand = require("dotenv-expand");
-
-dotenvExpand(dotenv.config());
-
 mongoose
   .connect(process.env.DB_URL!)
   .then(() => {

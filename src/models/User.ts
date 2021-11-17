@@ -1,4 +1,6 @@
 import mongoose, { Model } from "mongoose";
+import isEmail from "validator/lib/isEmail";
+
 import { UserDTO } from "../utils/dtos/user";
 
 const Schema = mongoose.Schema;
@@ -6,8 +8,13 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema<UserDTO>({
   username: { type: String, required: true, index: "hashed" },
   password: { type: String, required: true },
-  email: { type: String, required: true, index: "hashed" },
-  verified: { type: Boolean, default:false},
+  email: {
+    type: String,
+    required: true,
+    index: "hashed",
+    validate: [isEmail, "Invalid email."],
+  },
+  verified: { type: Boolean, default: false },
   chats: [
     {
       chatId: {

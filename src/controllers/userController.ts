@@ -13,6 +13,7 @@ userController.get("/user/:username", async (req: Request, res: Response) => {
     logger.error("user search");
     return res.status(400).json({ msg: `${USER.ERROR.BAD_REQUEST}` });
   }
+  logger.info(`searching for username: ${username}`);
   try {
     const [found] = await userService.findByUsername(username);
     if (found) {
