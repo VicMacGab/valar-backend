@@ -1,10 +1,12 @@
+import mailService from "./mailService";
+
 class twoFactorService {
   authCodes: Record<string, number> = {};
   timers: Record<string, NodeJS.Timeout> = {};
 
   constructor() {}
 
-  createCode(username: string, code: number) {
+  createCode(username: string, email: string, code: number) {
     // si pidió el 2 factor de nuevo, resetear el countdown
     if (this.authCodes[username]) {
       clearTimeout(this.timers[username]);
@@ -13,6 +15,10 @@ class twoFactorService {
     // asociar el codigo al username
     this.authCodes[username] = code;
     console.log(`created code ${code} for username ${username}`);
+
+    console.log(`Email to: ${email}`);
+
+    mailService.sendCode(email, code);
 
     // setear el countdown
     this.timers[username] = setTimeout(() => {

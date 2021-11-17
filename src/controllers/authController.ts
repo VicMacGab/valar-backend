@@ -63,7 +63,7 @@ authController.post("/auth/signup", async (req: Request, res: Response) => {
           if (err) {
             return res.status(500).json({ msg: USER.ERROR.GENERIC });
           }
-          twoFactorService.createCode(req.body.username, num);
+          twoFactorService.createCode(req.body.username, req.body.email, num);
           return res
             .status(201)
             .cookie("username", usernameJWT, COOKIE_OPTIONS_2FACTOR)
@@ -101,7 +101,11 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
                 if (err) {
                   return res.status(500).json({ msg: USER.ERROR.GENERIC });
                 }
-                twoFactorService.createCode(req.body.username, num);
+                twoFactorService.createCode(
+                  req.body.username,
+                  user!.email,
+                  num
+                );
                 return res
                   .status(201)
                   .cookie("username", token, COOKIE_OPTIONS_2FACTOR)
@@ -200,7 +204,7 @@ authController.post("/auth/createAuthCode", (req: Request, res: Response) => {
     if (err) {
       return res.status(500).json({ msg: USER.ERROR.GENERIC });
     }
-    twoFactorService.createCode(req.body.username, num);
+    twoFactorService.createCode(req.body.username, req.body.email, num);
     return res.status(201).json({ msg: "auth code created", code: num });
   });
 });
