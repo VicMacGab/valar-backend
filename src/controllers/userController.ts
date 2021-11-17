@@ -1,11 +1,14 @@
 import express, { Request, Response, Router } from "express";
 
+import loggedInMiddleware from "../middleware/loggedInMiddleware";
 import logger from "../services/logger";
 import userService from "../services/userService";
 
 import { USER } from "../utils/constants/messages";
 
 const userController: Router = express.Router();
+
+userController.use("/user", loggedInMiddleware);
 
 userController.get("/user/:username", async (req: Request, res: Response) => {
   const username = req.params.username;

@@ -4,6 +4,7 @@ export const USER = {
     FOUND: "User found successfully!",
     SIGNIN: "Signed in succesfully!",
     AUTH: "Authentication was successful.",
+    LOGOUT: "Sucessfully logged out.",
   },
   ERROR: {
     CREATION: "Error when creating user.",
@@ -16,6 +17,8 @@ export const USER = {
     SIGNIN: "Incorrect username or password.",
     AUTH_CODE: "Auth code is missing.",
     AUTH_CODE_EXPIRED: "Auth code expired.",
+    NOT_LOGGED_IN: "User is not logged in.",
+    TAMPERED_COOKIE: "Session cookie was tampered.",
   },
 };
 

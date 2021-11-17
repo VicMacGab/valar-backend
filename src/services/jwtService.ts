@@ -23,7 +23,6 @@ const jwtService = {
   verify: (token: string): Promise<jwt.JwtPayload> => {
     return new Promise((resolve, reject) => {
       jwt.verify(token, process.env.JWT_SECRET!, (err, decodedJWT) => {
-        logger.info(``);
         if (err) {
           logger.error(JSON.stringify(err, null, 2));
           if (err.name == "TokenExpiredError") {

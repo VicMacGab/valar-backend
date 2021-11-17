@@ -20,4 +20,5 @@ export const COOKIE_OPTIONS_SESSION: CookieOptions = {
   httpOnly: true,
   secure: true,
   signed: true,
+  // no maxAge por ahora
 };
