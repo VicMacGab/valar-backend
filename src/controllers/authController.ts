@@ -138,6 +138,8 @@ authController.get(
 
     const { username: usernameCookie } = req.cookies;
 
+    // TODO: borrar el username cookie si ha sido modificado
+
     if (!usernameCookie) {
       logger.error("auth code expired");
       return res.status(403).json({ msg: USER.ERROR.AUTH_CODE_EXPIRED });

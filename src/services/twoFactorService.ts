@@ -6,6 +6,8 @@ class twoFactorService {
 
   constructor() {}
 
+  // TODO: tmb trackear el numero de intentos
+
   createCode(username: string, email: string, code: number) {
     // si pidió el 2 factor de nuevo, resetear el countdown
     if (this.authCodes[username]) {
