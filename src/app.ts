@@ -14,21 +14,10 @@ dotenvExpand(dotenv.config());
 
 const api: express.Express = express();
 
+// setear headers
 api.use(helmet());
 
-// TODO: geeks for geeks signed cookies
-// TODO: mailer
-// TODO: servicio que maneja todos los authcodes
-
-// esto loggea cada incoming request y outgoing response
-// api.use((req, res, next) => {
-//   logger.request(req);
-//   logger.response(res);
-//   next();
-// });
-
 // por ahora permitir requests de cualquier origen
-// TODO: ver como hacemos esto (la whitelist)
 api.use(
   cors({
     origin: "http://localhost:3000",

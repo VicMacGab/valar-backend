@@ -263,6 +263,8 @@ body {font-family: 'Chivo', sans-serif;}
       html: mailService.generateEmail(code),
     };
 
+    // TODO: refactor para que el que llame esta funcion pueda saber si falló el envío del mail
+
     sgMail
       .send(msg)
       .then(() => {

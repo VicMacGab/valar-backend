@@ -21,9 +21,6 @@ import { randomInt } from "crypto";
 
 const authController: Router = express.Router();
 
-// TODO: 2 factor (para confirmar mail en signup y loggear en signin) (nodemailer, setear una expiración al código)
-// TODO: crear un servicio que se va a encargar de administrar todos los códigos por usuario
-
 // TODO: verified a false cuando haga logout (por el two-factor)
 
 authController.post("/auth/signup", async (req: Request, res: Response) => {
