@@ -20,7 +20,7 @@ api.use(helmet());
 // por ahora permitir requests de cualquier origen
 api.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "*",
     credentials: true,
   })
 );
