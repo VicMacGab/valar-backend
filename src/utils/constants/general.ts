@@ -2,6 +2,7 @@ import { CookieOptions } from "express";
 import { SignOptions } from "jsonwebtoken";
 
 export const SALT_ROUNDS = 10;
+export const MAX_AUTHCODE_TRIES = 3;
 
 export const AUTH = {
   SIGNIN_KEYS: ["username", "password"],

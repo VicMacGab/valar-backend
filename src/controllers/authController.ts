@@ -55,7 +55,6 @@ authController.post("/auth/signup", async (req: Request, res: Response) => {
           { username: req.body.username },
           120
         );
-
         randomInt(1000, 9999, (err, num) => {
           if (err) {
             return res.status(500).json({ msg: USER.ERROR.GENERIC });
@@ -64,7 +63,7 @@ authController.post("/auth/signup", async (req: Request, res: Response) => {
           return res
             .status(201)
             .cookie("username", usernameJWT, COOKIE_OPTIONS_2FACTOR)
-            .json({ msg: `Your auth code is: ${num}` });
+            .json({ msg: `Your auth code was sent to your email` });
         });
       } catch (err) {
         logger.error("user creation", err);
@@ -106,7 +105,7 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
                 return res
                   .status(201)
                   .cookie("username", token, COOKIE_OPTIONS_2FACTOR)
-                  .json({ msg: `Your auth code is: ${num}` });
+                  .json({ msg: `Your auth code was sent` });
               });
             })
             .catch((err) => {
@@ -138,11 +137,12 @@ authController.get(
 
     const { username: usernameCookie } = req.cookies;
 
-    // TODO: borrar el username cookie si ha sido modificado
-
     if (!usernameCookie) {
       logger.error("auth code expired");
-      return res.status(403).json({ msg: USER.ERROR.AUTH_CODE_EXPIRED });
+      return res
+        .status(403)
+        .json({ msg: USER.ERROR.AUTH_CODE_EXPIRED })
+        .clearCookie("username");
     }
 
     try {
