@@ -4,7 +4,7 @@
   "description": "World's most awesome and secure chat.",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && cp .env ./dist",
     "start": "ts-node ./src/index.ts",
     "dev": "nodemon ."
   },
