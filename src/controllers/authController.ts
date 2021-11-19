@@ -126,6 +126,8 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
   }
 });
 
+// TODO: ponerle guard de brute force al signin y sign up
+
 authController.get(
   "/auth/code/:authCode",
   async (req: Request, res: Response) => {
