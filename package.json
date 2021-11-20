@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc && cp .env ./dist",
-    "start": "ts-node ./src/index.ts",
+    "start": "node ./dist/index.js",
     "dev": "nodemon ."
   },
   "author": "VicMacGab",
