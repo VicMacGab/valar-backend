@@ -37,3 +37,14 @@ export const JWT = {
   NOT_ACTIVE: "El token todavía no es válido.",
   SIGN: "Error al crear el JWT.",
 };
+
+export const AUTHCODE = {
+  SENT: "Your auth code was sent to your email.",
+  MATCHED: "Code matched",
+  INCORRECT: "Incorrect code",
+  EXPIRED: "Code expired",
+};
+
+export const MIDDLEWARE = {
+  NOT_ALLOWED: "You're not allowed to access this route.",
+};

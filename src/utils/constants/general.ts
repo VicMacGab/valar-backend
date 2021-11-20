@@ -23,3 +23,9 @@ export const COOKIE_OPTIONS_SESSION: CookieOptions = {
   signed: true,
   // no maxAge por ahora
 };
+
+export const MIN_AUTHCODE_NUM = 1000;
+export const MAX_AUTHCODE_NUM = 9999;
+
+export const SENDGRID_FROM_MAIL = "victor.ostolaza@utec.edu.pe";
+export const SENDGRID_SUBJECT = "Valar Two-Factor Authentication";

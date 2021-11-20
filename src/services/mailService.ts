@@ -1,10 +1,13 @@
-require("dotenv").config();
+import sgMail from "@sendgrid/mail";
+import { SENDGRID_FROM_MAIL } from "../utils/constants/general";
+import { SENDGRID_SUBJECT } from "../utils/constants/general";
+import logger from "./logger";
 
-const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+require("dotenv").config();
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 const mailService = {
-  generateEmail: (code: number) => {
+  generateEmail: (code: number): string => {
     return `
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html data-editor-version="2" class="sg-campaigns" xmlns="http://www.w3.org/1999/xhtml">
@@ -253,26 +256,24 @@ body {font-family: 'Chivo', sans-serif;}
     </body>
   </html>`;
   },
-  sendCode: (email: string, code: number) => {
+  sendCode: async (email: string, code: number) => {
     const msg = {
       to: email,
       //TODO: Cambiar sender
-      from: "victor.ostolaza@utec.edu.pe",
-      subject: "Valar Two-Factor Authentication",
+      from: SENDGRID_FROM_MAIL,
+      subject: SENDGRID_SUBJECT,
       text: `Your two factor authentication code is ${code}`,
       html: mailService.generateEmail(code),
     };
 
-    // TODO: refactor para que el que llame esta funcion pueda saber si falló el envío del mail
-
-    sgMail
-      .send(msg)
-      .then(() => {
-        console.log("Email sent");
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    try {
+      const res = await sgMail.send(msg);
+      logger.info("email sent");
+      return res;
+    } catch (err) {
+      logger.error(`error when sending mail: ${JSON.stringify(err, null, 2)}`);
+      throw err;
+    }
   },
 };
 

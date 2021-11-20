@@ -8,6 +8,7 @@ import { MessageDTO } from "../utils/dtos/message";
 const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema<Partial<MessageDTO>>({
+  // TODO: timestamp
   content: String,
   idFrom: {
     type: Schema.Types.ObjectId,

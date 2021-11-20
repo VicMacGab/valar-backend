@@ -7,7 +7,11 @@ class twoFactorService {
 
   constructor() {}
 
-  createCode(username: string, email: string, code: number) {
+  async createCode(
+    username: string,
+    email: string,
+    code: number
+  ): Promise<void | any> {
     // si pidió el 2 factor de nuevo, resetear el countdown
     if (this.authCodes[username]) {
       clearTimeout(this.timers[username]);
@@ -20,7 +24,11 @@ class twoFactorService {
 
     console.log(`Email to: ${email}`);
 
-    mailService.sendCode(email, code);
+    try {
+      await mailService.sendCode(email, code);
+    } catch (error) {
+      return error;
+    }
 
     // setear el countdown
     this.timers[username] = setTimeout(() => {

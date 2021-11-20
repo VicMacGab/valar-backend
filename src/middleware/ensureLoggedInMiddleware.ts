@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { USER } from "../utils/constants/messages";
 import logger from "../services/logger";
 
-const loggedInMiddleware = (
+const ensureLoggedInMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
@@ -27,4 +27,4 @@ const loggedInMiddleware = (
   next();
 };
 
-export default loggedInMiddleware;
+export default ensureLoggedInMiddleware;

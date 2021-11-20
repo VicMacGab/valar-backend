@@ -6,18 +6,21 @@ import logger from "../services/logger";
 import userService from "../services/userService";
 import jwtService from "../services/jwtService";
 
-import { JWT, USER } from "../utils/constants/messages";
+import { AUTHCODE, JWT, USER } from "../utils/constants/messages";
 import {
   AUTH,
   COOKIE_OPTIONS_2FACTOR,
   COOKIE_OPTIONS_SESSION,
   INVALID_BODY,
+  MAX_AUTHCODE_NUM,
+  MIN_AUTHCODE_NUM,
 } from "../utils/constants/general";
 import { UserDTO } from "../utils/dtos/user";
 import { validBody } from "../utils/validation/body";
-import loggedInMiddleware from "../middleware/loggedInMiddleware";
 import twoFactorService from "../services/twoFactorService";
 import { randomInt } from "crypto";
+import ensureUsernameCookieMiddleware from "../middleware/ensureUsernameCookieMiddleware";
+import ensureLoggedInMiddleware from "../middleware/ensureLoggedInMiddleware";
 
 const authController: Router = express.Router();
 
@@ -55,15 +58,24 @@ authController.post("/auth/signup", async (req: Request, res: Response) => {
           { username: req.body.username },
           120
         );
-        randomInt(1000, 9999, (err, num) => {
+        randomInt(1000, 9999, async (err, num) => {
           if (err) {
             return res.status(500).json({ msg: USER.ERROR.GENERIC });
           }
-          twoFactorService.createCode(req.body.username, req.body.email, num);
-          return res
-            .status(201)
-            .cookie("username", usernameJWT, COOKIE_OPTIONS_2FACTOR)
-            .json({ msg: `Your auth code was sent to your email` });
+
+          try {
+            await twoFactorService.createCode(
+              req.body.username,
+              req.body.email,
+              num
+            );
+            return res
+              .status(201)
+              .cookie("username", usernameJWT, COOKIE_OPTIONS_2FACTOR)
+              .json({ msg: AUTHCODE.SENT });
+          } catch (error) {
+            return res.status(500).json({ msg: USER.ERROR.GENERIC });
+          }
         });
       } catch (err) {
         logger.error("user creation", err);
@@ -90,14 +102,15 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
           return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
         }
         if (passwordsMatch) {
-          jwtService
-            .sign({ username: req.body.username }, 120)
-            .then((token: string | undefined) => {
-              randomInt(1000, 9999, (err, num) => {
-                if (err) {
-                  return res.status(500).json({ msg: USER.ERROR.GENERIC });
-                }
-                twoFactorService.createCode(
+          try {
+            const token = jwtService.sign({ username: req.body.username }, 120);
+            randomInt(MIN_AUTHCODE_NUM, MAX_AUTHCODE_NUM, async (err, num) => {
+              if (err) {
+                return res.status(500).json({ msg: USER.ERROR.GENERIC });
+              }
+
+              try {
+                await twoFactorService.createCode(
                   req.body.username,
                   user!.email,
                   num
@@ -105,12 +118,14 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
                 return res
                   .status(201)
                   .cookie("username", token, COOKIE_OPTIONS_2FACTOR)
-                  .json({ msg: `Your auth code was sent` });
-              });
-            })
-            .catch((err) => {
-              return res.status(500).json({ msg: JWT.SIGN, err });
+                  .json({ msg: AUTHCODE.SENT });
+              } catch (error) {
+                return res.status(500).json({ msg: USER.ERROR.GENERIC });
+              }
             });
+          } catch (jwtError) {
+            return res.status(500).json({ msg: JWT.SIGN, jwtError });
+          }
         } else {
           return res.status(401).json({ msg: USER.ERROR.SIGNIN });
         }
@@ -129,6 +144,7 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
 
 authController.get(
   "/auth/code/:authCode",
+  ensureUsernameCookieMiddleware,
   async (req: Request, res: Response) => {
     const { authCode } = req.params;
     if (!authCode) {
@@ -139,13 +155,14 @@ authController.get(
 
     const { username: usernameCookie } = req.cookies;
 
-    if (!usernameCookie) {
-      logger.error("auth code expired");
-      return res
-        .status(403)
-        .json({ msg: USER.ERROR.AUTH_CODE_EXPIRED })
-        .clearCookie("username");
-    }
+    // lo de abajo ya no es necesario x el middleware
+    // if (!usernameCookie) {
+    //   logger.error("auth code expired");
+    //   return res
+    //     .status(403)
+    //     .json({ msg: USER.ERROR.AUTH_CODE_EXPIRED })
+    //     .clearCookie("username");
+    // }
 
     try {
       const decodedJWT = await jwtService.verify(usernameCookie);
@@ -182,7 +199,7 @@ authController.get(
 
 authController.post(
   "/auth/logout",
-  loggedInMiddleware,
+  ensureLoggedInMiddleware,
   (req: Request, res: Response) => {
     logger.info(
       `user logging out, his signed cookies: ${JSON.stringify(
@@ -200,15 +217,28 @@ authController.post(
 
 // NOTE: los de abajo solo son por debugging purposes
 
-authController.post("/auth/createAuthCode", (req: Request, res: Response) => {
-  randomInt(1000, 9999, (err, num) => {
-    if (err) {
-      return res.status(500).json({ msg: USER.ERROR.GENERIC });
-    }
-    twoFactorService.createCode(req.body.username, req.body.email, num);
-    return res.status(201).json({ msg: "auth code created", code: num });
-  });
-});
+authController.post(
+  "/auth/createAuthCode",
+  async (req: Request, res: Response) => {
+    randomInt(MIN_AUTHCODE_NUM, MAX_AUTHCODE_NUM, async (err, num) => {
+      if (err) {
+        return res.status(500).json({ msg: USER.ERROR.GENERIC });
+      }
+
+      try {
+        await twoFactorService.createCode(
+          req.body.username,
+          req.body.email,
+          num
+        );
+      } catch (error) {
+        return res.status(500).json({ msg: USER.ERROR.GENERIC });
+      }
+
+      return res.status(201).json({ msg: AUTHCODE.SENT });
+    });
+  }
+);
 
 authController.post("/auth/verifyAuthCode", (req: Request, res: Response) => {
   const [codesMatched, codeExpired] = twoFactorService.verifyAuthCode(
@@ -217,11 +247,11 @@ authController.post("/auth/verifyAuthCode", (req: Request, res: Response) => {
   );
 
   if (codesMatched) {
-    return res.status(202).json({ msg: "code matched" });
+    return res.status(202).json({ msg: AUTHCODE.MATCHED });
   } else if (!codesMatched && !codeExpired) {
-    return res.status(404).json({ msg: "incorrect code" });
+    return res.status(404).json({ msg: AUTHCODE.INCORRECT });
   } else {
-    return res.status(403).json({ msg: "code expired" });
+    return res.status(403).json({ msg: AUTHCODE.EXPIRED });
   }
 });
 

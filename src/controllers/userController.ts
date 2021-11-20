@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from "express";
+import ensureLoggedInMiddleware from "../middleware/ensureLoggedInMiddleware";
 
-import loggedInMiddleware from "../middleware/loggedInMiddleware";
 import logger from "../services/logger";
 import userService from "../services/userService";
 
@@ -8,13 +8,13 @@ import { USER } from "../utils/constants/messages";
 
 const userController: Router = express.Router();
 
-userController.use("/user", loggedInMiddleware);
+userController.use("/user", ensureLoggedInMiddleware);
 
 userController.get("/user/:username", async (req: Request, res: Response) => {
   const username = req.params.username;
   if (!username) {
     logger.error("user search");
-    return res.status(400).json({ msg: `${USER.ERROR.BAD_REQUEST}` });
+    return res.status(400).json({ msg: USER.ERROR.BAD_REQUEST });
   }
   logger.info(`searching for username: ${username}`);
   try {
@@ -24,7 +24,7 @@ userController.get("/user/:username", async (req: Request, res: Response) => {
       return res.status(200).json({ msg: USER.SUCCESS.FOUND, username });
     } else {
       logger.error("user search");
-      return res.status(404).json({ msg: `${USER.ERROR.NOT_FOUND}` });
+      return res.status(404).json({ msg: USER.ERROR.NOT_FOUND });
     }
   } catch (err) {
     logger.error("user search", err);

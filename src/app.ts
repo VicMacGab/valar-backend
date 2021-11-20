@@ -20,7 +20,10 @@ api.use(helmet());
 // por ahora permitir requests de cualquier origen
 api.use(
   cors({
-    origin: "https://valar-frontend.vercel.app/",
+    origin:
+      process.env.NODE_ENV == "production"
+        ? "https://valar-frontend.vercel.app/"
+        : "http://localhost:3000",
     credentials: true,
   })
 );
