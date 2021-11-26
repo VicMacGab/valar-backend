@@ -97,39 +97,50 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
     const [found, user] = await userService.findByUsername(req.body.username);
     if (found) {
       logger.info("user search", user);
-      compare(req.body.password, user!.password!, (err, passwordsMatch) => {
-        if (err) {
-          return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
-        }
-        if (passwordsMatch) {
-          try {
-            const token = jwtService.sign({ username: req.body.username }, 120);
-            randomInt(MIN_AUTHCODE_NUM, MAX_AUTHCODE_NUM, async (err, num) => {
-              if (err) {
-                return res.status(500).json({ msg: USER.ERROR.GENERIC });
-              }
-
-              try {
-                await twoFactorService.createCode(
-                  req.body.username,
-                  user!.email,
-                  num
-                );
-                return res
-                  .status(201)
-                  .cookie("username", token, COOKIE_OPTIONS_2FACTOR)
-                  .json({ msg: AUTHCODE.SENT });
-              } catch (error) {
-                return res.status(500).json({ msg: USER.ERROR.GENERIC });
-              }
-            });
-          } catch (jwtError) {
-            return res.status(500).json({ msg: JWT.SIGN, jwtError });
+      compare(
+        req.body.password,
+        user!.password!,
+        async (err, passwordsMatch) => {
+          if (err) {
+            return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
           }
-        } else {
-          return res.status(401).json({ msg: USER.ERROR.SIGNIN });
+          if (passwordsMatch) {
+            try {
+              const token = await jwtService.sign(
+                { username: req.body.username },
+                120
+              );
+              randomInt(
+                MIN_AUTHCODE_NUM,
+                MAX_AUTHCODE_NUM,
+                async (err, num) => {
+                  if (err) {
+                    return res.status(500).json({ msg: USER.ERROR.GENERIC });
+                  }
+
+                  try {
+                    await twoFactorService.createCode(
+                      req.body.username,
+                      user!.email,
+                      num
+                    );
+                    return res
+                      .status(201)
+                      .cookie("username", token, COOKIE_OPTIONS_2FACTOR)
+                      .json({ msg: AUTHCODE.SENT });
+                  } catch (error) {
+                    return res.status(500).json({ msg: USER.ERROR.GENERIC });
+                  }
+                }
+              );
+            } catch (jwtError) {
+              return res.status(500).json({ msg: JWT.SIGN, jwtError });
+            }
+          } else {
+            return res.status(401).json({ msg: USER.ERROR.SIGNIN });
+          }
         }
-      });
+      );
     } else {
       logger.error("user search");
       return res.status(404).json({ msg: `${USER.ERROR.SIGNIN}` });
