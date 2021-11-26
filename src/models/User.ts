@@ -26,6 +26,7 @@ const UserSchema = new Schema<UserDTO>({
   ],
   outgoingRequests: [
     {
+      // TODO: tanto el 'a', 'p' y 'g' deberían borrarse una vez rechazada/aceptada el request
       a: Schema.Types.Buffer,
       p: Schema.Types.Buffer,
       g: Schema.Types.Buffer,
@@ -37,6 +38,7 @@ const UserSchema = new Schema<UserDTO>({
   ],
   incomingRequests: [
     {
+      // TODO: tanto el 'peerPrivatePart', 'p' y 'g' deberían borrarse una vez rechazada/aceptada el request
       peerPrivatePart: Schema.Types.Buffer, // g^a mod p
       p: Schema.Types.Buffer,
       g: Schema.Types.Buffer,

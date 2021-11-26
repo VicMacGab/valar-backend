@@ -17,12 +17,20 @@ const api: express.Express = express();
 // setear headers
 api.use(helmet());
 
+// TODO: asegurarnos que los logs no expongan información sensible
+// TODO: convertir el transport del log a un archivo .log y reducirlo al logging que sea necesario
+// TODO: comprimir (gzip) la ruta que devuelve los mensajes
+// TODO: CSRF protection: https://owasp.org/www-community/attacks/csrf
+// TODO: cuidado con el control de inferencias con los mensajes de error y status codes
+// TODO: crear la cuenta luego del two factor (signup)
+
 // por ahora permitir requests de cualquier origen
+// TODO: si no manda el Origin header, no dejarlo pasar
 api.use(
   cors({
     origin:
       process.env.NODE_ENV == "production"
-        ? "https://valar-frontend.vercel.app/"
+        ? "https://valar-frontend.vercel.app"
         : "http://localhost:3000",
     credentials: true,
   })

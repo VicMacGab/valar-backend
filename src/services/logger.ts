@@ -23,19 +23,13 @@ const config = {
 
 winston.addColors(config.colors);
 
-const myFormat = winston.format.printf((info) => {
-  return JSON.stringify(info, null, 2);
-});
-
 const logger: winston.Logger | any = winston.createLogger({
   levels: config.levels,
   format: winston.format.combine(
-    // winston.format.prettyPrint(),
-    // myFormat,
     winston.format.colorize(),
     winston.format.simple()
   ),
-  // TODO: cambiar a .log files
+  // TODO: cambiar a .log files en producción
   transports: [new winston.transports.Console()],
   level: "response",
 });

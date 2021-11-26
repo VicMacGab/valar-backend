@@ -142,6 +142,16 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
 
 // TODO: ponerle guard de brute force al signin y sign up
 
+// TODO: hacer algo así
+// const decodeJWTFromCookie = async (cookie: string) => {
+//   try {
+//     const decodedJWT = await jwtService.verify(cookie);
+//     return [decodedJWT, null];
+//   } catch (error) {
+//     return [null, error];
+//   }
+// };
+
 authController.get(
   "/auth/code/:authCode",
   ensureUsernameCookieMiddleware,
