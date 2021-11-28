@@ -1,20 +1,29 @@
-name: GitHub Actions Demo
+name: Deploy Valar
 on:
   push:
-    branches:
-    - create-github-action
+    branches: [create-github-action]
 jobs:
-  Explore-GitHub-Actions:
+  deploy-valar:
+    env:
+      NODE_VER: 17.0.1
     runs-on: ubuntu-latest
     steps:
-      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-      - name: Check out repository code
+      - run: echo "Corriendo el workflow ${{ github.workflow }} por un ${{ github.event_name }} en ${{ github.ref }}."
+      - name: Get Valar Source Code
         uses: actions/checkout@v2
-      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-      - name: List files in the repository
+      - run: echo "El repo ${{ github.repository }} ha sido clonado en el runner."
+      - name: Listar los archivos descargados del repo
         run: |
           ls ${{ github.workspace }}
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - run: echo "Instalando la version ${{ env.NODE_VER }} de Node.js"
+      - name: Setup Node
+      - uses: actions/setup-node@v2
+        with:
+          version: "${{ env.NODE_VER }}"
+      - name: Install Yarn
+      - run: npm i -g yarn
+      - name: Install Dependencies with Yarn
+      - run: yarn
+      - name: Build Project
+      - run: yarn build
+      # TODO: copiar solo ./dist al servidor
