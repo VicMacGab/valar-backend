@@ -53,4 +53,6 @@ const UserSchema = new Schema<UserDTO>({
 
 const User: Model<UserDTO> = mongoose.model<UserDTO>("User", UserSchema);
 
+// User.on('index', () => console.log('created an index for User'));
+
 export default User;
