@@ -24,6 +24,13 @@ jobs:
         run: npm i -g yarn
       - name: Install Dependencies with Yarn
         run: yarn
+      - name: Create .env
+        run: |
+          touch .env
+          echo "${{ secrets.DB_URL }}" >> .env
+          echo "${{ secrets.JWT_SECRET }}" >> .env
+          echo "${{ secrets.COOKIES_SECRET }}" >> .env
+          echo "${{ secrets.SENDGRID_API_KEY }}" >> .env
       - name: Build Project
         run: yarn build
       # TODO: copiar solo ./dist al servidor
