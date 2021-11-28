@@ -17,13 +17,13 @@ jobs:
           ls ${{ github.workspace }}
       - run: echo "Instalando la version ${{ env.NODE_VER }} de Node.js"
       - name: Setup Node
-      - uses: actions/setup-node@v2
+        uses: actions/setup-node@v2
         with:
           version: "${{ env.NODE_VER }}"
       - name: Install Yarn
-      - run: npm i -g yarn
+        run: npm i -g yarn
       - name: Install Dependencies with Yarn
-      - run: yarn
+        run: yarn
       - name: Build Project
-      - run: yarn build
+        run: yarn build
       # TODO: copiar solo ./dist al servidor
