@@ -4,4 +4,5 @@ export interface ChatDTO {
   user1: string;
   user2: string;
   messages: MessageDTO[];
+  encrypted: Boolean;
 }

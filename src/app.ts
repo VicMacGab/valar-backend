@@ -11,6 +11,7 @@ import authController from "./controllers/authController";
 import userController from "./controllers/userController";
 import cookieParser from "cookie-parser";
 import logger from "./services/logger";
+import requestController from "./controllers/requestController";
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -59,14 +60,18 @@ api.get("/api", (req: Request, res: Response) => {
 api.use("/api", helloController);
 api.use("/api", authController);
 api.use("/api", userController);
+api.use("/api", requestController);
 
 const server: http.Server | https.Server = getServerFrom(api);
 const io = new Server(server);
 
 // TODO: register web socket handlers
 
+// ws://localhost:3000
+
 io.on("connection", (socket) => {
   logger.info("new ws connection");
+  socket.join("chat"); // unirme al room chat
   socket.on("message", (msg) => {
     logger.info(`message from client: ${JSON.stringify(msg, null, 2)}`);
   });

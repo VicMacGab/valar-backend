@@ -1,23 +1,24 @@
 interface UserChat {
   chatId: string;
   key: Buffer;
+  _id?: string;
 }
 
 interface OutgoingRequest {
-  a: Buffer;
-  p: Buffer;
-  g: Buffer;
-  userId: string;
+  user: string | Partial<UserDTO>;
+  _id?: string;
 }
 
 interface IncomingRequest {
-  peerPrivatePart: Buffer;
+  peerPublicPart: Buffer;
   p: Buffer;
   g: Buffer;
-  userId: string;
+  user: string | Partial<UserDTO>;
+  _id?: string;
 }
 
 export interface UserDTO {
+  _id: string;
   username: string;
   password?: string;
   email: string;
@@ -25,4 +26,5 @@ export interface UserDTO {
   chats: UserChat[];
   outgoingRequests: OutgoingRequest[];
   incomingRequests: IncomingRequest[];
+  save: () => Promise<void>;
 }
