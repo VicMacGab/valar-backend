@@ -10,10 +10,7 @@ const Schema = mongoose.Schema;
 const MessageSchema = new Schema<Partial<MessageDTO>>({
   // TODO: timestamp
   content: String,
-  idFrom: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-  },
+  usernameFrom: String,
   edited: Boolean,
   deleted: Boolean,
 });

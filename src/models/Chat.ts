@@ -10,11 +10,11 @@ import MessageSchema from "./Message";
 const Schema = mongoose.Schema;
 
 const ChatSchema = new Schema<Partial<ChatDTO>>({
-  idUser1: {
+  user1: {
     type: Schema.Types.ObjectId,
     ref: "User",
   },
-  idUser2: {
+  user2: {
     type: Schema.Types.ObjectId,
     ref: "User",
   },

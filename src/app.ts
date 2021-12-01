@@ -1,20 +1,22 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
+import http from "http";
+import https from "https";
+import { Server } from "socket.io";
+import { getServerFrom } from "./utils/server/general";
 
 import helloController from "./controllers/helloController";
 import authController from "./controllers/authController";
 import userController from "./controllers/userController";
 import cookieParser from "cookie-parser";
+import logger from "./services/logger";
 
 const dotenv = require("dotenv");
-const dotenvExpand = require("dotenv-expand");
-
-dotenvExpand(dotenv.config());
+dotenv.config();
 
 const api: express.Express = express();
 
-// setear headers
 api.use(helmet());
 
 // TODO: asegurarnos que los logs no expongan información sensible
@@ -23,9 +25,8 @@ api.use(helmet());
 // TODO: CSRF protection: https://owasp.org/www-community/attacks/csrf
 // TODO: cuidado con el control de inferencias con los mensajes de error y status codes
 // TODO: crear la cuenta luego del two factor (signup)
-
-// por ahora permitir requests de cualquier origen
 // TODO: si no manda el Origin header, no dejarlo pasar
+
 api.use(
   cors({
     origin:
@@ -36,14 +37,12 @@ api.use(
   })
 );
 
-// for parsing body con application/json
 api.use(
   express.json({
     limit: "1mb",
   })
 );
 
-// for parsing body con application/x-www-form-urlencoded
 api.use(
   express.urlencoded({
     extended: true,
@@ -51,7 +50,6 @@ api.use(
   })
 );
 
-// para usar cookies firmadas
 api.use(cookieParser(process.env.COOKIES_SECRET));
 
 api.get("/api", (req: Request, res: Response) => {
@@ -62,4 +60,16 @@ api.use("/api", helloController);
 api.use("/api", authController);
 api.use("/api", userController);
 
-export default api;
+const server: http.Server | https.Server = getServerFrom(api);
+const io = new Server(server);
+
+// TODO: register web socket handlers
+
+io.on("connection", (socket) => {
+  logger.info("new ws connection");
+  socket.on("message", (msg) => {
+    logger.info(`message from client: ${JSON.stringify(msg, null, 2)}`);
+  });
+});
+
+export default server;

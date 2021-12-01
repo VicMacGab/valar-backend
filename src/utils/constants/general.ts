@@ -24,6 +24,12 @@ export const COOKIE_OPTIONS_SESSION: CookieOptions = {
   // no maxAge por ahora
 };
 
+export const COOKIE_OPTIONS_USERNAME: CookieOptions = {
+  httpOnly: false,
+  secure: true,
+  signed: true,
+};
+
 export const MIN_AUTHCODE_NUM = 1000;
 export const MAX_AUTHCODE_NUM = 9999;
 

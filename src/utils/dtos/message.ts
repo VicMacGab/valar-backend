@@ -1,6 +1,6 @@
 export interface MessageDTO {
   content: string;
-  idFrom: string;
+  usernameFrom: string;
   edited: boolean;
   deleted: boolean;
 }

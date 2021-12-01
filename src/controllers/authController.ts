@@ -11,6 +11,7 @@ import {
   AUTH,
   COOKIE_OPTIONS_2FACTOR,
   COOKIE_OPTIONS_SESSION,
+  COOKIE_OPTIONS_USERNAME,
   INVALID_BODY,
   MAX_AUTHCODE_NUM,
   MIN_AUTHCODE_NUM,
@@ -203,7 +204,7 @@ authController.get(
             JSON.stringify({ username: decodedJWT.username }),
             COOKIE_OPTIONS_SESSION
           )
-          .json({ msg: USER.SUCCESS.AUTH });
+          .json({ msg: USER.SUCCESS.AUTH, username: decodedJWT.username });
       } else if (!codesMatched && !codeExpired) {
         return res.status(404).json({ msg: "incorrect code" });
       } else {

@@ -1,31 +1,23 @@
-// import fs from "fs";
-// import https from "https";
-
-import api from "./app";
+import server from "./app";
 import mongoose from "mongoose";
-
-// const privateKey = fs.readFileSync("sslcert/server.key", "utf8");
-// const certificate = fs.readFileSync("sslcert/server.crt", "utf8");
-// const credentials = { key: privateKey, cert: certificate };
-
-// const httpsServer = https.createServer(credentials, api);
+import logger from "./services/logger";
 
 mongoose
   .connect(process.env.DB_URL!)
   .then(() => {
-    console.log("sucessfully connected to mongo db 🤓");
+    logger.info("sucessfully connected to mongo db 🤓");
 
     if (process.env.NODE_ENV == "production") {
-      // httpsServer.listen(443, () => {
-      //   console.log("Valar Backend Initiatied.");
-      // });
+      server.listen(443, () => {
+        logger.info("Valar Backend Initiatied.");
+      });
     } else {
-      api.listen(process.env.PORT, () => {
-        console.log("Server Ready ⚡");
-        console.log(`Listening on http://localhost:${process.env.PORT}`);
+      server.listen(process.env.PORT, () => {
+        logger.info("Server Ready ⚡");
+        logger.info(`Listening on http://localhost:${process.env.PORT}`);
       });
     }
   })
   .catch((err) => {
-    console.log("cannot connect to mongo db: ", JSON.stringify(err, null, 2));
+    logger.error("cannot connect to mongo db: ", JSON.stringify(err, null, 2));
   });
