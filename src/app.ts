@@ -6,6 +6,7 @@ import helloController from "./controllers/helloController";
 import authController from "./controllers/authController";
 import userController from "./controllers/userController";
 import cookieParser from "cookie-parser";
+import requestController from "./controllers/requestController";
 
 const dotenv = require("dotenv");
 const dotenvExpand = require("dotenv-expand");
@@ -61,5 +62,6 @@ api.get("/api", (req: Request, res: Response) => {
 api.use("/api", helloController);
 api.use("/api", authController);
 api.use("/api", userController);
+api.use("/api", requestController);
 
 export default api;

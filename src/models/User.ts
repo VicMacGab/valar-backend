@@ -22,15 +22,12 @@ const UserSchema = new Schema<UserDTO>({
         ref: "Chat",
       },
       key: Schema.Types.Buffer,
+      encrypted: { type: Boolean, default: false },
     },
   ],
   outgoingRequests: [
     {
-      // TODO: tanto el 'a', 'p' y 'g' deberían borrarse una vez rechazada/aceptada el request
-      a: Schema.Types.Buffer,
-      p: Schema.Types.Buffer,
-      g: Schema.Types.Buffer,
-      userId: {
+      user: {
         type: Schema.Types.ObjectId,
         ref: "User",
       },
@@ -38,12 +35,11 @@ const UserSchema = new Schema<UserDTO>({
   ],
   incomingRequests: [
     {
-      // TODO: tanto el 'peerPrivatePart', 'p' y 'g' deberían borrarse una vez rechazada/aceptada el request
-      peerPrivatePart: Schema.Types.Buffer, // g^a mod p
+      peerPublicPart: Schema.Types.Buffer, // g^a mod p
       p: Schema.Types.Buffer,
       g: Schema.Types.Buffer,
       // g^b mod p
-      userId: {
+      user: {
         type: Schema.Types.ObjectId,
         ref: "User",
       },

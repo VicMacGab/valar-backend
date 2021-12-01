@@ -36,7 +36,40 @@ const userService = {
 
   findByUsername: (username: string): Promise<[boolean, UserDTO?]> => {
     return new Promise<[boolean, UserDTO?]>((resolve, reject) => {
-      User.findOne({ username: username }, "username verified password email")
+      User.findOne(
+        { username: username },
+        "_id username verified password email outgoingRequests incomingRequests"
+      )
+        .exec()
+        .then((user) => {
+          if (user) resolve([true, user]);
+          else resolve([false]);
+        })
+        .catch((err) => reject(err));
+    });
+  },
+
+  findByUsernameOutgoing: (
+    username: string
+  ): Promise<[boolean, Partial<UserDTO>?]> => {
+    return new Promise<[boolean, Partial<UserDTO>?]>((resolve, reject) => {
+      User.findOne({ username: username }, "outgoingRequests _id chats")
+        .populate("outgoingRequests.user", "username")
+        .exec()
+        .then((user) => {
+          if (user) resolve([true, user]);
+          else resolve([false]);
+        })
+        .catch((err) => reject(err));
+    });
+  },
+
+  findByUsernameIncoming: (
+    username: string
+  ): Promise<[boolean, Partial<UserDTO>?]> => {
+    return new Promise<[boolean, Partial<UserDTO>?]>((resolve, reject) => {
+      User.findOne({ username: username }, "incomingRequests _id chats")
+        .populate("incomingRequests.user", "username")
         .exec()
         .then((user) => {
           if (user) resolve([true, user]);
