@@ -1,6 +1,6 @@
 import server from "./app";
 import mongoose from "mongoose";
-import logger from "./services/logger";
+import logger from "./services/loggerService";
 
 mongoose
   .connect(process.env.DB_URL!)

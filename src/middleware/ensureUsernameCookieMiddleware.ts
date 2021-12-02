@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { MIDDLEWARE } from "../utils/constants/messages";
-import logger from "../services/logger";
+import logger from "../services/loggerService";
 import jwtService from "../services/jwtService";
 
 const ensureUsernameCookieMiddleware = async (

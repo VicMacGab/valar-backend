@@ -1,14 +1,18 @@
 import express, { Request, Response, Router } from "express";
+import { createDiffieHellman } from "crypto";
+
 import ensureLoggedInMiddleware from "../middleware/ensureLoggedInMiddleware";
 
 import userService from "../services/userService";
+import logger from "../services/loggerService";
 
-import { createDiffieHellman } from "crypto";
-import { request } from "http";
-import User from "../models/User";
-import { CHAT, USER } from "../utils/constants/messages";
-import logger from "../services/logger";
 import Chat from "../models/Chat";
+
+import { CHAT, USER } from "../utils/constants/messages";
+import { validBody } from "../utils/validation/body";
+import { REQUESTS } from "../utils/constants/general";
+import { INVALID_BODY } from "../utils/constants/general";
+import { DH_KEY_SIZE } from "../utils/constants/general";
 
 const requestController: Router = express.Router();
 
@@ -16,7 +20,7 @@ requestController.use("/requests", ensureLoggedInMiddleware);
 
 requestController.get("/requests/sent", async (req: Request, res: Response) => {
   const { valarSession } = req.signedCookies;
-  const { username } = JSON.parse(valarSession);
+  const { username } = valarSession;
   try {
     const [, user] = await userService.findByUsernameOutgoing(username);
     return res.status(200).json({ outgoingRequests: user?.outgoingRequests });
@@ -29,7 +33,7 @@ requestController.get(
   "/requests/received",
   async (req: Request, res: Response) => {
     const { valarSession } = req.signedCookies;
-    const { username } = JSON.parse(valarSession);
+    const { username } = valarSession;
     try {
       const [, user] = await userService.findByUsernameIncoming(username);
       return res.status(200).json({ incomingRequests: user?.incomingRequests });
@@ -43,9 +47,12 @@ requestController.get(
 requestController.post(
   "/requests/send",
   async (req: Request, res: Response) => {
+    if (!validBody(req.body, REQUESTS.SEND_KEYS)) {
+      return res.status(400).json({ msg: INVALID_BODY });
+    }
     const { valarSession } = req.signedCookies;
-    const { username } = JSON.parse(valarSession);
-    //TODO promise all
+    const { username } = valarSession;
+
     try {
       const p1 = userService.findByUsername(username);
       const p2 = userService.findByUsername(req.body.username);
@@ -53,15 +60,16 @@ requestController.post(
         await Promise.all([p1, p2]);
 
       if (!outgoingFound || !incomingFound) {
-        logger.error("requests send");
+        logger.error(
+          "user sending the request or user receiving the request not found"
+        );
         return res.status(404).json({ msg: USER.ERROR.NOT_FOUND });
       }
 
-      // TODO que corra en otro thread
-      const alice = createDiffieHellman(2048);
+      // TODO: que corra en otro thread ya que ahorita bloquea el main thread
+      const alice = createDiffieHellman(DH_KEY_SIZE);
 
       const alicePublicKey = alice.generateKeys();
-      const alicePrivateKey = alice.getPrivateKey();
 
       const prime = alice.getPrime();
       const generator = alice.getGenerator();
@@ -70,7 +78,7 @@ requestController.post(
         user: incomingUser!._id,
       });
 
-      await outgoingUser!.save();
+      const outgoingUserProm = outgoingUser!.save();
 
       incomingUser!.incomingRequests.push({
         peerPublicPart: alicePublicKey,
@@ -79,7 +87,9 @@ requestController.post(
         user: outgoingUser!._id,
       });
 
-      await incomingUser!.save();
+      const incomingUserProm = incomingUser!.save();
+
+      await Promise.all([outgoingUserProm, incomingUserProm]);
 
       return res
         .status(200)
@@ -93,21 +103,25 @@ requestController.post(
 requestController.post(
   "/requests/accept",
   async (req: Request, res: Response) => {
+    if (!validBody(req.body, REQUESTS.ACCEPT_KEYS)) {
+      return res.status(400).json({ msg: INVALID_BODY });
+    }
     const { valarSession } = req.signedCookies;
-    const { username } = JSON.parse(valarSession);
+    const { username } = valarSession;
+
     try {
       const p1 = userService.findByUsernameIncoming(username);
       const p2 = userService.findByUsernameOutgoing(req.body.username);
       const [[, user], [, friend]] = await Promise.all([p1, p2]);
 
       const incomingRequest = user?.incomingRequests?.find(
-        (request: any) => request.user.username === req.body.username
+        (request) => request.user.username === req.body.username
       );
       const outgoingRequestFriend = friend?.outgoingRequests?.find(
-        (request: any) => request.user.username === username
+        (request) => request.user.username === username
       );
 
-      //@ts-ignore
+      // TODO: que corra en otro thread ya que ahorita bloquea el main thread
       const me = createDiffieHellman(
         incomingRequest!.p.toString("hex"),
         "hex",
@@ -136,21 +150,28 @@ requestController.post(
         key: secret,
       });
 
-      //@ts-ignore
       user?.incomingRequests?.id(incomingRequest?._id).remove();
-      //@ts-ignore
       friend?.outgoingRequests?.id(outgoingRequestFriend?._id).remove();
 
-      //@ts-ignore
-      const userPromise = user.save();
-      //@ts-ignore
-      const friendPromise = friend.save();
+      const userPromise = user!.save();
+      const friendPromise = friend!.save();
+
       await Promise.all([userPromise, friendPromise]);
 
       return res.status(200).json({ msg: CHAT.SUCCESS.CREATION });
     } catch (err) {
       return res.status(500).json({ msg: CHAT.ERROR.CREATION, err });
     }
+  }
+);
+
+requestController.post(
+  "/requests/decline",
+  async (req: Request, res: Response) => {
+    if (!validBody(req.body, REQUESTS.DECLINE_KEYS)) {
+      return res.status(400).json({ msg: INVALID_BODY });
+    }
+    // TODO: borrar el request de incoming y de outgoing de los usuarios correspondientes
   }
 );
 

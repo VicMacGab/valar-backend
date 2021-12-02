@@ -2,7 +2,7 @@ import express, { Request, Response, Router } from "express";
 import { compare } from "bcrypt";
 
 import securityService from "../services/securityService";
-import logger from "../services/logger";
+import logger from "../services/loggerService";
 import userService from "../services/userService";
 import jwtService from "../services/jwtService";
 

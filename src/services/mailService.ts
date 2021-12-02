@@ -1,7 +1,7 @@
 import sgMail from "@sendgrid/mail";
 import { SENDGRID_FROM_MAIL } from "../utils/constants/general";
 import { SENDGRID_SUBJECT } from "../utils/constants/general";
-import logger from "./logger";
+import logger from "./loggerService";
 
 require("dotenv").config();
 sgMail.setApiKey(process.env.SENDGRID_API_KEY!);

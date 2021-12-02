@@ -1,7 +1,7 @@
 import express, { Request, Response, Router } from "express";
 import ensureLoggedInMiddleware from "../middleware/ensureLoggedInMiddleware";
 
-import logger from "../services/logger";
+import logger from "../services/loggerService";
 import userService from "../services/userService";
 
 import { USER } from "../utils/constants/messages";

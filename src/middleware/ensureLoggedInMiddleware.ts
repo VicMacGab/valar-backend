@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { USER } from "../utils/constants/messages";
-import logger from "../services/logger";
+import logger from "../services/loggerService";
 
 const ensureLoggedInMiddleware = (
   req: Request,
@@ -23,6 +23,8 @@ const ensureLoggedInMiddleware = (
     // NOTE: el usuario no está loggeado
     return res.status(403).json({ msg: USER.ERROR.NOT_LOGGED_IN });
   }
+
+  req.signedCookies.valarSession = JSON.parse(valarSession);
 
   next();
 };

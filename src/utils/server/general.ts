@@ -3,7 +3,7 @@ import https from "https";
 import fs from "fs";
 import path from "path";
 import express from "express";
-import logger from "../../services/logger";
+import logger from "../../services/loggerService";
 
 export const getServerFrom = (
   api: express.Express

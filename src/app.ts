@@ -10,7 +10,7 @@ import helloController from "./controllers/helloController";
 import authController from "./controllers/authController";
 import userController from "./controllers/userController";
 import cookieParser from "cookie-parser";
-import logger from "./services/logger";
+import logger from "./services/loggerService";
 import requestController from "./controllers/requestController";
 
 const dotenv = require("dotenv");

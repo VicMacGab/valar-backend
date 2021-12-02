@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import { JWT } from "../utils/constants/messages";
-import logger from "./logger";
+import logger from "./loggerService";
 
 const jwtService = {
   sign: (payload: any, expiresIn?: number): Promise<string | undefined> => {
@@ -24,7 +24,7 @@ const jwtService = {
     return new Promise((resolve, reject) => {
       jwt.verify(token, process.env.JWT_SECRET!, (err, decodedJWT) => {
         if (err) {
-          logger.error(JSON.stringify(err, null, 2));
+          logger.error(`error verifying jwt: ${err.name}`);
           if (err.name == "TokenExpiredError") {
             reject(JWT.EXPIRED);
           } else if (err.name == "JsonWebTokenError") {

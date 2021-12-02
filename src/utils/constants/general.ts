@@ -3,10 +3,17 @@ import { SignOptions } from "jsonwebtoken";
 
 export const SALT_ROUNDS = 10;
 export const MAX_AUTHCODE_TRIES = 3;
+export const DH_KEY_SIZE = 2048;
 
 export const AUTH = {
   SIGNIN_KEYS: ["username", "password"],
   SIGNUP_KEYS: ["username", "email", "password"],
+};
+
+export const REQUESTS = {
+  SEND_KEYS: ["username"],
+  ACCEPT_KEYS: ["username"],
+  DECLINE_KEYS: ["username"],
 };
 
 export const INVALID_BODY = "Invalid body";

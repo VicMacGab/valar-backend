@@ -24,7 +24,7 @@ export interface UserDTO {
   email: string;
   verified: boolean;
   chats: UserChat[];
-  outgoingRequests: OutgoingRequest[];
-  incomingRequests: IncomingRequest[];
+  outgoingRequests: OutgoingRequest[] & any;
+  incomingRequests: IncomingRequest[] & any;
   save: () => Promise<void>;
 }
