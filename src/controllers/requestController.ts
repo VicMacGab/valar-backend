@@ -165,12 +165,54 @@ requestController.post(
   }
 );
 
+// TODO mandar solicitudes a gente que ya es amigo
+// TODO no dejar que se mande a si mismo
+//TODO refactor a services de las cosas repetidas
 requestController.post(
   "/requests/decline",
   async (req: Request, res: Response) => {
     if (!validBody(req.body, REQUESTS.DECLINE_KEYS)) {
       return res.status(400).json({ msg: INVALID_BODY });
     }
+
+    const { valarSession } = req.signedCookies;
+    const { username } = valarSession;
+
+    try {
+      const p1 = userService.findByUsernameIncoming(username);
+      const p2 = userService.findByUsernameOutgoing(req.body.username);
+      const [[incomingFound, incomingUser], [outgoingFound, outgoingUser]] =
+        await Promise.all([p1, p2]);
+
+      if (!outgoingFound || !incomingFound) {
+        logger.error(
+          "user sending the request or user receiving the request not found"
+        );
+        return res.status(404).json({ msg: USER.ERROR.NOT_FOUND });
+      }
+
+      const incomingRequest = incomingUser?.incomingRequests?.find(
+        (request) => request.user.username === req.body.username
+      );
+
+      const outgoingRequest = outgoingUser?.outgoingRequests?.find(
+        (request) => request.user.username === username
+      );
+
+      incomingUser?.incomingRequests?.id(incomingRequest?._id).remove();
+      outgoingUser?.outgoingRequests?.id(outgoingRequest?._id).remove();
+
+      const incomingPromise = incomingUser!.save();
+      const outgoingPromise = outgoingUser!.save();
+
+      await Promise.all([incomingPromise, incomingPromise]);
+
+      return res.status(200).json({});
+    } catch (err) {
+      logger.info(`err${JSON.stringify(err, null, 2)}`);
+      return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
+    }
+
     // TODO: borrar el request de incoming y de outgoing de los usuarios correspondientes
   }
 );
