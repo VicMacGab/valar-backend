@@ -133,8 +133,8 @@ requestController.post(
       const secret = me.computeSecret(incomingRequest!.peerPublicPart);
 
       const chatObject = new Chat({
-        idUser1: user?._id,
-        idUser2: friend?._id,
+        user1: user?._id,
+        user2: friend?._id,
         messages: [],
       });
 
