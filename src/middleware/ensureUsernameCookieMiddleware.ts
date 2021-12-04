@@ -8,10 +8,6 @@ const ensureUsernameCookieMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  logger.warn(
-    `incoming normal cookies: ${JSON.stringify(req.cookies, null, 2)}`
-  );
-
   // hay rutas que se usan para verificar el two factor code
   // solo deben ser accesidas si el user mandó el username cookie
   // sino, le estamos haciendp perder tiempo al sevidor, así que
@@ -20,6 +16,9 @@ const ensureUsernameCookieMiddleware = async (
   const { username: usernameCookie } = req.cookies;
 
   if (!usernameCookie) {
+    logger.error(
+      `tried to access protected ensureUsernameCookieMiddleware route from ip: ${req.ip}`
+    );
     return res.status(403).json({ msg: MIDDLEWARE.NOT_ALLOWED });
   }
   next();

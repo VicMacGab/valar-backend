@@ -1,7 +1,7 @@
 name: Deploy Valar
 on:
   push:
-    branches: [create-github-action]
+    branches: [feat/websocket]
 jobs:
   deploy-valar:
     env:

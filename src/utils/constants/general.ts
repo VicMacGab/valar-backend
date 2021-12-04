@@ -1,9 +1,11 @@
 import { CookieOptions } from "express";
-import { SignOptions } from "jsonwebtoken";
 
 export const SALT_ROUNDS = 10;
 export const MAX_AUTHCODE_TRIES = 3;
 export const DH_KEY_SIZE = 2048;
+export const MAX_PASSWORD_SIZE = 64;
+export const MAX_USERNAME_SIZE = 32;
+export const MAX_EMAIL_SIZE = 254;
 
 export const AUTH = {
   SIGNIN_KEYS: ["username", "password"],
@@ -29,12 +31,6 @@ export const COOKIE_OPTIONS_SESSION: CookieOptions = {
   secure: true,
   signed: true,
   // no maxAge por ahora
-};
-
-export const COOKIE_OPTIONS_USERNAME: CookieOptions = {
-  httpOnly: false,
-  secure: true,
-  signed: true,
 };
 
 export const MIN_AUTHCODE_NUM = 1000;

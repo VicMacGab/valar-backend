@@ -21,6 +21,9 @@ export const USER = {
     AUTH_CODE_EXPIRED: "Auth code expired.",
     NOT_LOGGED_IN: "User is not logged in.",
     TAMPERED_COOKIE: "Session cookie was tampered.",
+    PASSWORD_TOO_LONG: "Password surpasses allowed limit.",
+    USERNAME_TOO_LONG: "Username surpasses allowed limit.",
+    EMAIL_TOO_LONG: "Email surpasses allowed limit.",
   },
 };
 

@@ -7,20 +7,17 @@ const ensureLoggedInMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  logger.warn(
-    `incoming signed cookies: ${JSON.stringify(req.signedCookies, null, 2)}`
-  );
-  logger.warn(
-    `incoming normal cookies: ${JSON.stringify(req.cookies, null, 2)}`
-  );
-
   const { valarSession } = req.signedCookies;
 
   if (valarSession === false) {
     // NOTE: el usuario cambió el valor del cookie
+    logger.error(`tampered cookie from ip: ${req.ip}`);
     return res.status(403).json({ msg: USER.ERROR.TAMPERED_COOKIE });
   } else if (valarSession === undefined) {
     // NOTE: el usuario no está loggeado
+    logger.error(
+      `tried to access protected ensureLoggedInMiddleware route from ip: ${req.ip}`
+    );
     return res.status(403).json({ msg: USER.ERROR.NOT_LOGGED_IN });
   }
 

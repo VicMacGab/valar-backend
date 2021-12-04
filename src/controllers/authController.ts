@@ -11,9 +11,11 @@ import {
   AUTH,
   COOKIE_OPTIONS_2FACTOR,
   COOKIE_OPTIONS_SESSION,
-  COOKIE_OPTIONS_USERNAME,
   INVALID_BODY,
   MAX_AUTHCODE_NUM,
+  MAX_EMAIL_SIZE,
+  MAX_PASSWORD_SIZE,
+  MAX_USERNAME_SIZE,
   MIN_AUTHCODE_NUM,
 } from "../utils/constants/general";
 import { UserDTO } from "../utils/dtos/user";
@@ -26,10 +28,32 @@ import ensureLoggedInMiddleware from "../middleware/ensureLoggedInMiddleware";
 const authController: Router = express.Router();
 
 // TODO: verified a false cuando haga logout (por el two-factor)
+// TODO: poner el validBody en un middleware
+// TODO: poner lo de chequear lengths en un middleware
 
 authController.post("/auth/signup", async (req: Request, res: Response) => {
   if (!validBody(req.body, AUTH.SIGNUP_KEYS)) {
     return res.status(400).json({ msg: INVALID_BODY });
+  }
+
+  // TODO: embellecer
+  if (req.body.password.length > MAX_PASSWORD_SIZE) {
+    logger.error(
+      `password length (${req.body.password.length}) exceeded limit from ip: ${req.ip}`
+    );
+    return res.status(400).json({ msg: USER.ERROR.PASSWORD_TOO_LONG });
+  }
+  if (req.body.username > MAX_USERNAME_SIZE) {
+    logger.error(
+      `username length (${req.body.username.length}) exceeded limit from ip: ${req.ip}`
+    );
+    return res.status(400).json({ msg: USER.ERROR.USERNAME_TOO_LONG });
+  }
+  if (req.body.email > MAX_EMAIL_SIZE) {
+    logger.error(
+      `email length (${req.body.email.length}) exceeded limit from ip: ${req.ip}`
+    );
+    return res.status(400).json({ msg: USER.ERROR.EMAIL_TOO_LONG });
   }
 
   try {
@@ -94,6 +118,19 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
     return res.status(400).json({ msg: INVALID_BODY });
   }
 
+  if (req.body.password.length > MAX_PASSWORD_SIZE) {
+    logger.error(
+      `password length (${req.body.password.length}) exceeded limit from ip: ${req.ip}`
+    );
+    return res.status(400).json({ msg: USER.ERROR.PASSWORD_TOO_LONG });
+  }
+  if (req.body.username > MAX_USERNAME_SIZE) {
+    logger.error(
+      `username length (${req.body.username.length}) exceeded limit from ip: ${req.ip}`
+    );
+    return res.status(400).json({ msg: USER.ERROR.USERNAME_TOO_LONG });
+  }
+
   try {
     const [found, user] = await userService.findByUsername(req.body.username);
     if (found) {
@@ -103,6 +140,7 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
         user!.password!,
         async (err, passwordsMatch) => {
           if (err) {
+            logger.error("error comparing hashed passwords");
             return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
           }
           if (passwordsMatch) {
@@ -116,6 +154,7 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
                 MAX_AUTHCODE_NUM,
                 async (err, num) => {
                   if (err) {
+                    logger.error("error generating random int");
                     return res.status(500).json({ msg: USER.ERROR.GENERIC });
                   }
 
@@ -138,6 +177,9 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
               return res.status(500).json({ msg: JWT.SIGN, jwtError });
             }
           } else {
+            logger.warn(
+              `incorrect password attempt for username ${req.body.username}, password: ${req.body.password} from ip: ${req.body.ip}`
+            );
             return res.status(401).json({ msg: USER.ERROR.SIGNIN });
           }
         }
@@ -206,8 +248,14 @@ authController.get(
           )
           .json({ msg: USER.SUCCESS.AUTH, username: decodedJWT.username });
       } else if (!codesMatched && !codeExpired) {
+        logger.warn(
+          `incorrect auth code attempt from ip ${req.body.ip}, auth code attempt: ${authCode} for username: ${usernameCookie}`
+        );
         return res.status(404).json({ msg: "incorrect code" });
       } else {
+        logger.warn(
+          `expired auth code attempt from ip ${req.body.ip}, auth code attempt: ${authCode} for username: ${usernameCookie}`
+        );
         return res.status(403).json({ msg: "code expired" });
       }
     } catch (err) {
@@ -239,42 +287,42 @@ authController.post(
 
 // NOTE: los de abajo solo son por debugging purposes
 
-authController.post(
-  "/auth/createAuthCode",
-  async (req: Request, res: Response) => {
-    randomInt(MIN_AUTHCODE_NUM, MAX_AUTHCODE_NUM, async (err, num) => {
-      if (err) {
-        return res.status(500).json({ msg: USER.ERROR.GENERIC });
-      }
+// authController.post(
+//   "/auth/createAuthCode",
+//   async (req: Request, res: Response) => {
+//     randomInt(MIN_AUTHCODE_NUM, MAX_AUTHCODE_NUM, async (err, num) => {
+//       if (err) {
+//         return res.status(500).json({ msg: USER.ERROR.GENERIC });
+//       }
 
-      try {
-        await twoFactorService.createCode(
-          req.body.username,
-          req.body.email,
-          num
-        );
-      } catch (error) {
-        return res.status(500).json({ msg: USER.ERROR.GENERIC });
-      }
+//       try {
+//         await twoFactorService.createCode(
+//           req.body.username,
+//           req.body.email,
+//           num
+//         );
+//         return res.status(201).json({ msg: AUTHCODE.SENT });
+//       } catch (error) {
+//         return res.status(500).json({ msg: USER.ERROR.GENERIC });
+//       }
 
-      return res.status(201).json({ msg: AUTHCODE.SENT });
-    });
-  }
-);
+//     });
+//   }
+// );
 
-authController.post("/auth/verifyAuthCode", (req: Request, res: Response) => {
-  const [codesMatched, codeExpired] = twoFactorService.verifyAuthCode(
-    req.body.username,
-    req.body.code
-  );
+// authController.post("/auth/verifyAuthCode", (req: Request, res: Response) => {
+//   const [codesMatched, codeExpired] = twoFactorService.verifyAuthCode(
+//     req.body.username,
+//     req.body.code
+//   );
 
-  if (codesMatched) {
-    return res.status(202).json({ msg: AUTHCODE.MATCHED });
-  } else if (!codesMatched && !codeExpired) {
-    return res.status(404).json({ msg: AUTHCODE.INCORRECT });
-  } else {
-    return res.status(403).json({ msg: AUTHCODE.EXPIRED });
-  }
-});
+//   if (codesMatched) {
+//     return res.status(202).json({ msg: AUTHCODE.MATCHED });
+//   } else if (!codesMatched && !codeExpired) {
+//     return res.status(404).json({ msg: AUTHCODE.INCORRECT });
+//   } else {
+//     return res.status(403).json({ msg: AUTHCODE.EXPIRED });
+//   }
+// });
 
 export default authController;

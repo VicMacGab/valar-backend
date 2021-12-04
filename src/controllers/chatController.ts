@@ -3,7 +3,6 @@ import chatService from "../services/chatService";
 import ensureLoggedInMiddleware from "../middleware/ensureLoggedInMiddleware";
 import logger from "../services/loggerService";
 import { CHAT } from "../utils/constants/messages";
-import { RequestOptions } from "https";
 
 const chatController: Router = express.Router();
 
@@ -21,13 +20,14 @@ chatController.get("/chats/all", async (req: Request, res: Response) => {
   }
 });
 
-chatController.get("/chats/:chatId", async (req: Request, res: Response) => {
+chatController.post("/chats", async (req: Request, res: Response) => {
+  // TODO: validate body has chatId
   const { valarSession } = req.signedCookies;
   const { username } = valarSession;
-  const { chatId } = req.params;
+  const { chatId } = req.body.chatId;
   try {
     // TODO ver si es que yo tengo un chat con ese id
-    // asi veo que es mio
+    // asi veo que es mio y poder detectar sapos
     const chat = await chatService.getChatById(chatId);
     logger.info(`chat: ${JSON.stringify(chat, null, 2)}`);
     return res.status(200).json({ chat });
