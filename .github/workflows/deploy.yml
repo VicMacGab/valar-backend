@@ -31,6 +31,34 @@ jobs:
           echo "${{ secrets.JWT_SECRET }}" >> .env
           echo "${{ secrets.COOKIES_SECRET }}" >> .env
           echo "${{ secrets.SENDGRID_API_KEY }}" >> .env
+          echo "NODE_ENV=production" >> .env
       - name: Build Project
         run: yarn build
-      # TODO: copiar solo ./dist al servidor
+      - name: Copy dist folder to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          source: "./dist/*"
+          target: "/home/ubuntu/valar-backend/dist/"
+      - name: Copy dist folder to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          source: "./package.json"
+          target: "/home/ubuntu/valar-backend/"
+      - name: Restart server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /home/ubuntu/valar-backend/
+            yarn
+            cd dist
+            echo ${{ secrets.PASSWORD }} | sudo -S pm2 restart index.js
