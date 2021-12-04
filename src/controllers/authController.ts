@@ -134,7 +134,7 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
   try {
     const [found, user] = await userService.findByUsername(req.body.username);
     if (found) {
-      logger.info("user search", user);
+      logger.info(`signin: searching for username: ${req.body.username}`);
       compare(
         req.body.password,
         user!.password!,
