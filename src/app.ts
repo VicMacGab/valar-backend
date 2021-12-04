@@ -12,6 +12,7 @@ import userController from "./controllers/userController";
 import cookieParser from "cookie-parser";
 import logger from "./services/loggerService";
 import requestController from "./controllers/requestController";
+import chatController from "./controllers/chatController";
 
 const dotenv = require("dotenv");
 dotenv.config();
@@ -61,6 +62,7 @@ api.use("/api", helloController);
 api.use("/api", authController);
 api.use("/api", userController);
 api.use("/api", requestController);
+api.use("/api", chatController);
 
 const server: http.Server | https.Server = getServerFrom(api);
 const io = new Server(server);

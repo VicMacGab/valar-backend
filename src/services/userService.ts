@@ -38,6 +38,7 @@ const userService = {
     });
   },
 
+  //TODO hacer proyeccion con un parametro
   findByUsername: (
     username: string
   ): Promise<[boolean, MongooseUserQueryResult?]> => {

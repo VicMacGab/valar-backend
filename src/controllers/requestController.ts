@@ -91,9 +91,7 @@ requestController.post(
 
       await Promise.all([outgoingUserProm, incomingUserProm]);
 
-      return res
-        .status(200)
-        .json({ outgoingRequests: outgoingUser!.outgoingRequests });
+      return res.status(200).json({ msg: USER.SUCCESS.SENT });
     } catch (err) {
       return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
     }
@@ -205,11 +203,11 @@ requestController.post(
       const incomingPromise = incomingUser!.save();
       const outgoingPromise = outgoingUser!.save();
 
-      await Promise.all([incomingPromise, incomingPromise]);
+      await Promise.all([incomingPromise, outgoingPromise]);
 
-      return res.status(200).json({});
+      return res.status(200).json({ msg: USER.SUCCESS.DECLINED });
     } catch (err) {
-      logger.info(`err${JSON.stringify(err, null, 2)}`);
+      logger.error(`${JSON.stringify(err, null, 2)}`);
       return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
     }
 

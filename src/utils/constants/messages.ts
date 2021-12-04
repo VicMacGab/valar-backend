@@ -4,7 +4,9 @@ export const USER = {
     FOUND: "User found successfully!",
     SIGNIN: "Signed in succesfully!",
     AUTH: "Authentication was successful.",
-    LOGOUT: "Sucessfully logged out.",
+    LOGOUT: "Successfully logged out.",
+    DECLINED: "Successfully declined request.",
+    SENT: "Successfully sent request.",
   },
   ERROR: {
     CREATION: "Error when creating user.",
@@ -28,6 +30,7 @@ export const CHAT = {
   },
   ERROR: {
     CREATION: "Error when creating chat!",
+    GENERIC: "Error when searching for all chats!.",
   },
 };
 
