@@ -37,6 +37,12 @@ export const CHAT = {
   },
 };
 
+export const MESSAGE = {
+  ERROR: {
+    CREATION: "Error creating message",
+  },
+};
+
 export const JWT = {
   EXPIRED: "El token expiró.",
   MALFORMED: "El token es inválido.",

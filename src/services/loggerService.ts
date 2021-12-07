@@ -24,6 +24,8 @@ const config = {
   },
 };
 
+// TODO: add child loggers para saber en qué archivo ocurrió un log
+
 winston.addColors(config.colors);
 
 const logger: winston.Logger | any = winston.createLogger({

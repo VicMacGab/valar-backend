@@ -4,6 +4,8 @@ import { ChatDTO } from "../utils/dtos/chat";
 import User from "../models/User";
 
 import { UserDTO } from "../utils/dtos/user";
+import { MessageDTO } from "../utils/dtos/message";
+import logger from "./loggerService";
 
 type MongooseUserQueryResult =
   | (Document<any, any, UserDTO> & UserDTO & { _id: string })
@@ -44,6 +46,28 @@ const chatService = {
       return chat;
     } catch (err) {
       return err;
+    }
+  },
+
+  insertMessageToChat: async (
+    chatId: string,
+    message: MessageDTO
+  ): Promise<MongooseChatQueryResult | unknown> => {
+    try {
+      logger.debug(`message: ${JSON.stringify(message, null, 2)}`);
+      const res = await Chat.findByIdAndUpdate(
+        chatId,
+        {
+          $push: { messages: message },
+        },
+        {
+          projection: "_id",
+        }
+      ).exec();
+      logger.debug(`saved message res: ${JSON.stringify(res, null, 2)}`);
+      return res;
+    } catch (error) {
+      return error;
     }
   },
 };
