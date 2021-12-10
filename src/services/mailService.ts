@@ -1,5 +1,4 @@
 import sgMail from "@sendgrid/mail";
-import { SENDGRID_FROM_MAIL } from "../utils/constants/general";
 import { SENDGRID_SUBJECT } from "../utils/constants/general";
 import logger from "./loggerService";
 
@@ -259,8 +258,7 @@ body {font-family: 'Chivo', sans-serif;}
   sendCode: async (email: string, code: number) => {
     const msg = {
       to: email,
-      //TODO: Cambiar sender
-      from: SENDGRID_FROM_MAIL,
+      from: process.env.SENDGRID_FROM_MAIL!,
       subject: SENDGRID_SUBJECT,
       text: `Your two factor authentication code is ${code}`,
       html: mailService.generateEmail(code),

@@ -1,15 +1,9 @@
 import mongoose from "mongoose";
-import logger from "../services/loggerService";
 import { MessageDTO } from "../utils/dtos/message";
-
-// schema = los tipos de dato de cada fila
-// collection = tabla
-// document = tupla
 
 const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema<Partial<MessageDTO>>({
-  // TODO: timestamp
   content: {
     type: Schema.Types.String,
     required: true,

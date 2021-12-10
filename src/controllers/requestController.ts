@@ -54,17 +54,28 @@ requestController.post(
     const { username } = valarSession;
 
     try {
-      const p1 = userService.findByUsername(username);
-      const p2 = userService.findByUsername(req.body.username);
-      const [[outgoingFound, outgoingUser], [incomingFound, incomingUser]] =
-        await Promise.all([p1, p2]);
+      const [incomingFound, incomingUser] = await userService.findByUsername(
+        req.body.username
+      );
 
-      if (!outgoingFound || !incomingFound) {
+      if (!incomingFound) {
         logger.error(
           "user sending the request or user receiving the request not found"
         );
         return res.status(404).json({ msg: USER.ERROR.NOT_FOUND });
       }
+
+      const conflict = await userService.findRequestConflict(
+        username,
+        incomingUser?.username!,
+        incomingUser?._id
+      );
+
+      if (conflict) {
+        return res.status(400).json({ msg: USER.ERROR.REQUEST_CONFLICT });
+      }
+
+      const [_, outgoingUser] = await userService.findByUsername(username);
 
       // TODO: que corra en otro thread ya que ahorita bloquea el main thread
       const alice = createDiffieHellman(DH_KEY_SIZE);
@@ -108,9 +119,12 @@ requestController.post(
     const { username } = valarSession;
 
     try {
-      const p1 = userService.findByUsernameIncoming(username);
-      const p2 = userService.findByUsernameOutgoing(req.body.username);
-      const [[, user], [, friend]] = await Promise.all([p1, p2]);
+      const p1 = userService.findByUsernameOutgoing(req.body.username);
+      const p2 = userService.findByUsernameIncoming(username);
+      const [[, friend], [, user]] = await Promise.all([p1, p2]);
+
+      logger.debug(`friend: ${JSON.stringify(friend, null, 2)}`);
+      logger.debug(`user: ${JSON.stringify(user, null, 2)}`);
 
       const incomingRequest = user?.incomingRequests?.find(
         (request: any) => request.user.username === req.body.username
@@ -160,6 +174,7 @@ requestController.post(
 
       return res.status(200).json({ msg: CHAT.SUCCESS.CREATION });
     } catch (err) {
+      logger.debug(`[accept request]: ${JSON.stringify(err, null, 2)}`);
       return res.status(500).json({ msg: CHAT.ERROR.CREATION, err });
     }
   }

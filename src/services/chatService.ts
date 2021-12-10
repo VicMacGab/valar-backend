@@ -22,7 +22,7 @@ const chatService = {
     try {
       const chats = await User.findOne(
         { username: username },
-        "chats.user"
+        "chats.user chats.chat"
       ).populate("chats.user", "username");
       // .populate({
       //   path: "chats.chat",

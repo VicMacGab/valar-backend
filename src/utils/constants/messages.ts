@@ -24,6 +24,8 @@ export const USER = {
     PASSWORD_TOO_LONG: "Password surpasses allowed limit.",
     USERNAME_TOO_LONG: "Username surpasses allowed limit.",
     EMAIL_TOO_LONG: "Email surpasses allowed limit.",
+    REQUEST_CONFLICT:
+      "El usuario ya lo tienes agregado, ya te mandó solicitud o ya le mandaste solicitud.",
   },
 };
 

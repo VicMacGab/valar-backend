@@ -64,7 +64,10 @@ const userService = {
   ): Promise<[boolean, MongooseUserQueryResult?]> => {
     return new Promise<[boolean, MongooseUserQueryResult?]>(
       (resolve, reject) => {
-        User.findOne({ username: username }, "outgoingRequests _id chats")
+        User.findOne(
+          { username: username },
+          "outgoingRequests _id chats.encrypted"
+        )
           .populate("outgoingRequests.user", "username")
           .exec()
           .then((user: MongooseUserQueryResult) => {
@@ -82,7 +85,10 @@ const userService = {
     // TODO: hacer que chats solo devuelva quiénes son los miembros por default, sino la cagada: nos devolverá todos los mensajes siempre
     return new Promise<[boolean, MongooseUserQueryResult?]>(
       (resolve, reject) => {
-        User.findOne({ username: username }, "incomingRequests _id chats")
+        User.findOne(
+          { username: username },
+          "incomingRequests _id chats.encrypted"
+        )
           .populate("incomingRequests.user", "username")
           .exec()
           .then((user: MongooseUserQueryResult) => {
@@ -111,7 +117,7 @@ const userService = {
         "_id"
       ).exec();
       logger.debug(`[findRequestConflict]: ${JSON.stringify(user, null, 2)}`);
-      return user !== null;
+      return user === null;
     } catch (error) {
       return error;
     }
