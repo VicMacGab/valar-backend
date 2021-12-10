@@ -194,7 +194,7 @@ authController.post("/auth/signin", async (req: Request, res: Response) => {
   }
 });
 
-// TODO: ponerle guard de brute force al signin y sign up
+// TODO: cuidado con que creen 10^9 cuentas en el sign up
 
 // TODO: hacer algo así
 // const decodeJWTFromCookie = async (cookie: string) => {

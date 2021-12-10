@@ -30,7 +30,6 @@ winston.addColors(config.colors);
 
 const logger: winston.Logger | any = winston.createLogger({
   levels: config.levels,
-  // TODO: cambiar el formato a uno OWASP-compliant
   format:
     process.env.NODE_ENV == "production"
       ? winston.format.combine(

@@ -39,6 +39,7 @@ const userService = {
     });
   },
 
+  // FIXME: IMPORTANT
   //TODO hacer proyeccion con un parametro
   findByUsername: (
     username: string
@@ -82,7 +83,6 @@ const userService = {
   findByUsernameIncoming: (
     username: string
   ): Promise<[boolean, MongooseUserQueryResult?]> => {
-    // TODO: hacer que chats solo devuelva quiénes son los miembros por default, sino la cagada: nos devolverá todos los mensajes siempre
     return new Promise<[boolean, MongooseUserQueryResult?]>(
       (resolve, reject) => {
         User.findOne(

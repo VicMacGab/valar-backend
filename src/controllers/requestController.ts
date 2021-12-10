@@ -43,7 +43,6 @@ requestController.get(
   }
 );
 
-//TODO verificar que no se pueda mandar de nuevo si ya se mando 1 vez
 requestController.post(
   "/requests/send",
   async (req: Request, res: Response) => {
@@ -180,8 +179,6 @@ requestController.post(
   }
 );
 
-// TODO mandar solicitudes a gente que ya es amigo
-// TODO no dejar que se mande a si mismo
 //TODO refactor a services de las cosas repetidas
 requestController.post(
   "/requests/decline",
