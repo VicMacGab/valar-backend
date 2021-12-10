@@ -1,6 +1,7 @@
 import { CallbackError, Document } from "mongoose";
 import User from "../models/User";
 import { UserDTO } from "../utils/dtos/user";
+import logger from "./loggerService";
 
 type MongooseUserQueryResult =
   | (Document<any, any, UserDTO> & UserDTO & { _id: string })
@@ -91,6 +92,29 @@ const userService = {
           .catch((err) => reject(err));
       }
     );
+  },
+
+  findRequestConflict: async (
+    myUsername: string,
+    friendsUsername: string,
+    friendsId: string
+  ): Promise<boolean | unknown> => {
+    if (friendsUsername == myUsername) return true;
+    try {
+      const user = await User.findOne(
+        {
+          username: myUsername,
+          "incomingRequests.user": { $eq: friendsId },
+          "outgoingRequests.user": { $eq: friendsId },
+          "chats.user": { $eq: friendsId },
+        },
+        "_id"
+      ).exec();
+      logger.debug(`[findRequestConflict]: ${JSON.stringify(user, null, 2)}`);
+      return user !== null;
+    } catch (error) {
+      return error;
+    }
   },
 };
 

@@ -20,18 +20,21 @@ const chatService = {
     username: string
   ): Promise<MongooseUserQueryResult | unknown> => {
     try {
-      const chats = await User.findOne({ username: username }, "chats.chatId")
-        .populate({
-          path: "chats.chatId",
-          select: "user1 user2",
-          populate: {
-            path: "user1 user2",
-            select: "username",
-            match: { username: { $ne: username } },
-            model: "User",
-          },
-        })
-        .select("chatId");
+      const chats = await User.findOne(
+        { username: username },
+        "chats.user"
+      ).populate("chats.user", "username");
+      // .populate({
+      //   path: "chats.chat",
+      //   select: "user1 user2",
+      //   populate: {
+      //     path: "user1 user2",
+      //     select: "username",
+      //     match: { username: { $ne: username } },
+      //     model: "User",
+      //   },
+      // })
+      // .select("chat");
       return chats;
     } catch (err) {
       return err;

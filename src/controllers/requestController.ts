@@ -113,10 +113,10 @@ requestController.post(
       const [[, user], [, friend]] = await Promise.all([p1, p2]);
 
       const incomingRequest = user?.incomingRequests?.find(
-        (request) => request.user.username === req.body.username
+        (request: any) => request.user.username === req.body.username
       );
       const outgoingRequestFriend = friend?.outgoingRequests?.find(
-        (request) => request.user.username === username
+        (request: any) => request.user.username === username
       );
 
       // TODO: que corra en otro thread ya que ahorita bloquea el main thread
@@ -139,13 +139,15 @@ requestController.post(
       const chat = await chatObject.save();
 
       user!.chats!.push({
-        chatId: chat._id,
+        chat: chat._id,
         key: secret,
+        user: friend?._id,
       });
 
       friend!.chats!.push({
-        chatId: chat._id,
+        chat: chat._id,
         key: secret,
+        user: user?._id,
       });
 
       user?.incomingRequests?.id(incomingRequest?._id).remove();
@@ -190,11 +192,11 @@ requestController.post(
       }
 
       const incomingRequest = incomingUser?.incomingRequests?.find(
-        (request) => request.user.username === req.body.username
+        (request: any) => request.user.username === req.body.username
       );
 
       const outgoingRequest = outgoingUser?.outgoingRequests?.find(
-        (request) => request.user.username === username
+        (request: any) => request.user.username === username
       );
 
       incomingUser?.incomingRequests?.id(incomingRequest?._id).remove();
@@ -210,8 +212,6 @@ requestController.post(
       logger.error(`${JSON.stringify(err, null, 2)}`);
       return res.status(500).json({ msg: USER.ERROR.GENERIC, err });
     }
-
-    // TODO: borrar el request de incoming y de outgoing de los usuarios correspondientes
   }
 );
 

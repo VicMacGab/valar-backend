@@ -1,6 +1,10 @@
+import { ChatDTO } from "./chat";
+
 interface UserChat {
-  chatId: string;
+  chat: string | Partial<ChatDTO>;
+  user: string | Partial<UserDTO>;
   key: Buffer;
+  encrypted?: boolean;
   _id?: string;
 }
 
@@ -24,7 +28,7 @@ export interface UserDTO {
   email: string;
   verified: boolean;
   chats: UserChat[];
-  outgoingRequests: OutgoingRequest[] & any;
-  incomingRequests: IncomingRequest[] & any;
+  outgoingRequests: OutgoingRequest[] | any;
+  incomingRequests: IncomingRequest[] | any;
   save: () => Promise<void>;
 }

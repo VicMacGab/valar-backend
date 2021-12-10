@@ -17,9 +17,13 @@ const UserSchema = new Schema<UserDTO>({
   verified: { type: Boolean, default: false },
   chats: [
     {
-      chatId: {
+      chat: {
         type: Schema.Types.ObjectId,
         ref: "Chat",
+      },
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
       },
       key: Schema.Types.Buffer,
       encrypted: { type: Boolean, default: false },
