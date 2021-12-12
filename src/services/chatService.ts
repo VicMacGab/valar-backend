@@ -7,18 +7,18 @@ import { UserDTO } from "../utils/dtos/user";
 import { MessageDTO } from "../utils/dtos/message";
 import logger from "./loggerService";
 
-type MongooseUserQueryResult =
+export type MongooseUserQueryResult =
   | (Document<any, any, UserDTO> & UserDTO & { _id: string })
   | null;
 
-type MongooseChatQueryResult =
+export type MongooseChatQueryResult =
   | (Document<any, any, ChatDTO> & ChatDTO & { _id: string })
   | null;
 
 const chatService = {
   getChatsByUsername: async (
     username: string
-  ): Promise<MongooseUserQueryResult | unknown> => {
+  ): Promise<MongooseUserQueryResult | any> => {
     try {
       const chats = await User.findOne(
         { username: username },
@@ -43,7 +43,7 @@ const chatService = {
 
   getChatById: async (
     chatId: string
-  ): Promise<MongooseChatQueryResult | unknown> => {
+  ): Promise<MongooseChatQueryResult | any> => {
     try {
       const chat = await Chat.findById(chatId, "messages").exec();
       return chat;
@@ -55,7 +55,7 @@ const chatService = {
   insertMessageToChat: async (
     chatId: string,
     message: MessageDTO
-  ): Promise<MongooseChatQueryResult | unknown> => {
+  ): Promise<MongooseChatQueryResult | any> => {
     try {
       logger.debug(`message: ${JSON.stringify(message, null, 2)}`);
       const res = await Chat.findByIdAndUpdate(
@@ -64,7 +64,8 @@ const chatService = {
           $push: { messages: message },
         },
         {
-          projection: "_id",
+          new: true,
+          projection: "messages._id",
         }
       ).exec();
       logger.debug(`saved message res: ${JSON.stringify(res, null, 2)}`);

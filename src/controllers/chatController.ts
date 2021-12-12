@@ -13,8 +13,8 @@ chatController.get("/chats/all", async (req: Request, res: Response) => {
   const { username } = valarSession;
   try {
     const chats = await chatService.getChatsByUsername(username);
-    logger.info(`chats: ${JSON.stringify(chats, null, 2)}`);
-    return res.status(200).json({ chats });
+    // logger.info(`chats: ${JSON.stringify(chats, null, 2)}`);
+    return res.status(200).json({ chats: chats.chats });
   } catch (err) {
     return res.status(500).json({ msg: CHAT.ERROR.GENERIC, err });
   }

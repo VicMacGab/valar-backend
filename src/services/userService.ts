@@ -117,7 +117,7 @@ const userService = {
         "_id"
       ).exec();
       logger.debug(`[findRequestConflict]: ${JSON.stringify(user, null, 2)}`);
-      return user === null;
+      return user !== null;
     } catch (error) {
       return error;
     }
