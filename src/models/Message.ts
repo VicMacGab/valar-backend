@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Model } from "mongoose";
 import { MessageDTO } from "../utils/dtos/message";
 
 const Schema = mongoose.Schema;
@@ -8,6 +8,7 @@ const MessageSchema = new Schema<Partial<MessageDTO>>({
     type: Schema.Types.String,
     required: true,
   },
+  //TODO: username cambiar a id
   usernameFrom: {
     type: Schema.Types.String,
     required: true,
@@ -24,6 +25,15 @@ const MessageSchema = new Schema<Partial<MessageDTO>>({
     type: Schema.Types.Date,
     default: () => Date.now(),
   },
+  chatId: {
+    type: Schema.Types.ObjectId,
+    ref: "Chat",
+  },
 });
 
-export default MessageSchema;
+const Message: Model<Partial<MessageDTO>> = mongoose.model(
+  "Message",
+  MessageSchema
+);
+
+export default Message;

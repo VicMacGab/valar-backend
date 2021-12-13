@@ -18,7 +18,6 @@ const ChatSchema = new Schema<Partial<ChatDTO>>({
     type: Schema.Types.ObjectId,
     ref: "User",
   },
-  messages: [MessageSchema],
 });
 
 const Chat: Model<Partial<ChatDTO>> = mongoose.model("Chat", ChatSchema);

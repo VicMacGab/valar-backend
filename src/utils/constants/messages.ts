@@ -32,16 +32,24 @@ export const USER = {
 export const CHAT = {
   SUCCESS: {
     CREATION: "Chat successfully created!",
+    DELETED: "Chat successfully deleted!",
   },
   ERROR: {
     CREATION: "Error when creating chat!",
     GENERIC: "Error when searching for all chats!.",
+    NOTME: "Trying to process a chat that was not send by the user.",
   },
 };
 
 export const MESSAGE = {
+  SUCCESS: {
+    SENT: "Message successfully sent!",
+    EDITED: "Message successfully edited!",
+    DELETED: "Message successfully deleted!",
+  },
   ERROR: {
-    CREATION: "Error creating message",
+    GENERIC: "Error with processing message.",
+    NOTME: "Trying to process a message that was not send by the user.",
   },
 };
 

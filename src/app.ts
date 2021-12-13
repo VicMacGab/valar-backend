@@ -22,6 +22,8 @@ import chatService from "./services/chatService";
 import { MessageDTO } from "./utils/dtos/message";
 import { MessageAck } from "./utils/interfaces/MessageAck";
 
+//TODO meter id en la galleta
+
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -36,7 +38,9 @@ api.use(helmet());
 // TODO: cuidado con el control de inferencias con los mensajes de error y status codes
 // TODO: crear la cuenta luego del two factor (signup)
 // TODO: si no manda el Origin header, no dejarlo pasar
+// TODO: crear la cuenta en la bd solo cuando hayamos verificado su correo
 
+// FIXME: no esta funcionando
 api.use(
   cors({
     origin:
@@ -144,16 +148,17 @@ io.on("connection", async (socket) => {
       logger.debug(`sending msg ${msg.content} to room ${meta.destination}`);
 
       try {
-        // TODO: mejorar el chapamiento del msgId porq ahorita es ineficiente O(n)
-        const res = await chatService.insertMessageToChat(
-          meta.destination,
-          msg
-        );
-        const newMsgId = res.messages[res.messages.length - 1]._id;
-        socket.to(meta.destination).emit("message", { _id: newMsgId, ...msg });
+        // TODO: mejorar
+        const newMsg = await chatService.insertMessageToChat(msg);
+        socket.to(meta.destination).emit("message", {
+          _id: newMsg._id,
+          timestamp: newMsg.timestamp,
+          ...msg,
+        });
         callback({
           ok: true,
-          _id: newMsgId,
+          _id: newMsg._id,
+          timestamp: newMsg.timestamp,
         });
       } catch (error) {
         callback({
