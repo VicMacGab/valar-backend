@@ -146,7 +146,6 @@ requestController.post(
       const chatObject = new Chat({
         user1: user?._id,
         user2: friend?._id,
-        messages: [],
       });
 
       const chat = await chatObject.save();

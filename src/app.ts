@@ -22,6 +22,8 @@ import chatService from "./services/chatService";
 import { MessageDTO } from "./utils/dtos/message";
 import { MessageAck } from "./utils/interfaces/MessageAck";
 
+//TODO meter id en la galleta
+
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -142,15 +144,16 @@ io.on("connection", async (socket) => {
 
       try {
         // TODO: mejorar
-        const res = await chatService.insertMessageToChat(
-          meta.destination,
-          msg
-        );
-        const newMsgId = res.messages[res.messages.length - 1]._id;
-        socket.to(meta.destination).emit("message", { _id: newMsgId, ...msg });
+        const newMsg = await chatService.insertMessageToChat(msg);
+        socket.to(meta.destination).emit("message", {
+          _id: newMsg._id,
+          timestamp: newMsg.timestamp,
+          ...msg,
+        });
         callback({
           ok: true,
-          _id: newMsgId,
+          _id: newMsg._id,
+          timestamp: newMsg.timestamp,
         });
       } catch (error) {
         callback({

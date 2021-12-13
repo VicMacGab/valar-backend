@@ -4,4 +4,5 @@ export interface MessageDTO {
   edited?: boolean;
   deleted?: boolean;
   timestamp?: Date;
+  chatId: string;
 }
