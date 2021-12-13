@@ -24,12 +24,14 @@ export const COOKIE_OPTIONS_2FACTOR: CookieOptions = {
   httpOnly: true, // document.cookie no puede acceder a ella
   secure: true, //  solo se manda por HTTPS a menos que sea localhost
   maxAge: 120 * 1000, //  no son exactamente 2 minutos, pero por ahí
+  sameSite: true, // para prevenir CSRF
 };
 
 export const COOKIE_OPTIONS_SESSION: CookieOptions = {
   httpOnly: true,
   secure: true,
   signed: true,
+  sameSite: true, // para prevenir CSRF
   // no maxAge por ahora
 };
 

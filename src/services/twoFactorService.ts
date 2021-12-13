@@ -2,8 +2,11 @@ import { MAX_AUTHCODE_TRIES } from "../utils/constants/general";
 import mailService from "./mailService";
 
 class twoFactorService {
+  // TODO: cambiarlo a que sea un Map ya que es más rápido
   authCodes: Record<string, [number, number]> = {};
   timers: Record<string, NodeJS.Timeout> = {};
+  // authCodes: Map<string, [number, number]> = new Map();
+  // timers: Map<string, NodeJS.Timeout> = new Map();
 
   constructor() {}
 

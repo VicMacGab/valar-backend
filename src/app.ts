@@ -98,6 +98,7 @@ io.use((socket, next) => {
     logger.warn(
       `attempted unauthorized access from ip: ${socket.request.headers.origin}`
     );
+    // TODO: desloguearlo
     const err = new Error("Unauthorized");
     next(err);
   } else {
@@ -107,6 +108,8 @@ io.use((socket, next) => {
   }
 });
 
+// namespace = una conexión TCP
+// TODO: socket.io/admin para debuguear si es necesario
 io.on("connection", async (socket) => {
   logger.info(
     // @ts-ignore
@@ -141,7 +144,7 @@ io.on("connection", async (socket) => {
       logger.debug(`sending msg ${msg.content} to room ${meta.destination}`);
 
       try {
-        // TODO: mejorar
+        // TODO: mejorar el chapamiento del msgId porq ahorita es ineficiente O(n)
         const res = await chatService.insertMessageToChat(
           meta.destination,
           msg
