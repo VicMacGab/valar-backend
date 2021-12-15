@@ -20,7 +20,11 @@ import ensureLoggedInMiddleware from "./middleware/ensureLoggedInMiddleware";
 import chatService from "./services/chatService";
 
 import { MessageDTO } from "./utils/dtos/message";
-import { MessageAck } from "./utils/interfaces/MessageAck";
+import { MessageAck } from "./utils/dtos/messageAck";
+import { EditedMessageDto } from "./utils/dtos/editedMessage";
+import { DeletedMessage } from "./utils/dtos/deletedMessage";
+import { EditedMessageAck } from "./utils/dtos/editedMessageAck";
+import { DeletedMessageAck } from "./utils/dtos/deletedMessageAck";
 
 //TODO meter id en la galleta
 
@@ -133,24 +137,76 @@ io.on("connection", async (socket) => {
   });
 
   socket.on(
-    "message",
+    "messageEdit",
     async (
-      msg: MessageDTO,
-      meta: { destination: string },
-      callback: (ack: MessageAck) => void
+      editedMessage: EditedMessageDto,
+      callback: (ack: EditedMessageAck) => void
     ) => {
+      try {
+        // @ts-ignore
+        const username = socket.request.signedCookies.valarSession.username;
+        await chatService.editMessageInChat(
+          username,
+          editedMessage.newContent,
+          editedMessage.msgId
+        );
+        socket.to(editedMessage.chatId).emit("peerMessageEdit", {
+          msgId: editedMessage.msgId,
+          newContent: editedMessage.newContent,
+          msgIdx: editedMessage.msgIdx,
+        });
+        callback({
+          ok: true,
+        });
+      } catch (error) {
+        callback({
+          ok: false,
+          reason: error,
+        });
+      }
+    }
+  );
+  socket.on(
+    "messageDelete",
+    async (
+      deletedMessage: DeletedMessage,
+      callback: (ack: DeletedMessageAck) => void
+    ) => {
+      try {
+        // @ts-ignore
+        const username = socket.request.signedCookies.valarSession.username;
+        await chatService.removeMessageInChat(username, deletedMessage.msgId);
+        socket.to(deletedMessage.chatId).emit("peerMessageDelete", {
+          msgId: deletedMessage.msgId,
+          msgIdx: deletedMessage.msgIdx,
+        });
+        callback({
+          ok: true,
+        });
+      } catch (error) {
+        callback({
+          ok: false,
+          reason: error,
+        });
+      }
+    }
+  );
+
+  socket.on(
+    "message",
+    async (msg: MessageDTO, callback: (ack: MessageAck) => void) => {
       logger.debug(
         `msg from ${
           // @ts-ignore
           socket.request.signedCookies.valarSession.username
         }: ${JSON.stringify(msg, null, 2)}`
       );
-      logger.debug(`sending msg ${msg.content} to room ${meta.destination}`);
+      logger.debug(`sending msg ${msg.content} to room ${msg.chatId}`);
 
       try {
         // TODO: mejorar
         const newMsg = await chatService.insertMessageToChat(msg);
-        socket.to(meta.destination).emit("message", {
+        socket.to(msg.chatId).emit("message", {
           _id: newMsg._id,
           timestamp: newMsg.timestamp,
           ...msg,

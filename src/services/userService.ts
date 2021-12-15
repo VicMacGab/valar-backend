@@ -119,7 +119,7 @@ const userService = {
       logger.debug(`[findRequestConflict]: ${JSON.stringify(user, null, 2)}`);
       return user !== null;
     } catch (error) {
-      return error;
+      throw error;
     }
   },
 };

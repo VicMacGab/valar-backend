@@ -27,7 +27,7 @@ const chatService = {
       ).populate("chats.user", "username");
       return chats;
     } catch (err) {
-      return err;
+      throw err;
     }
   },
 
@@ -40,10 +40,10 @@ const chatService = {
         { chatId: chatId },
         "content usernameFrom edited deleted timestamp _id"
       );
-      logger.info(`${JSON.stringify(chat, null, 2)}`);
+      // logger.info(`${JSON.stringify(chat, null, 2)}`);
       return chat;
     } catch (err) {
-      return err;
+      throw err;
     }
   },
 
@@ -56,7 +56,7 @@ const chatService = {
       logger.debug(`saved message res: ${JSON.stringify(res, null, 2)}`);
       return res;
     } catch (error) {
-      return error;
+      throw error;
     }
   },
 
@@ -64,40 +64,41 @@ const chatService = {
     username: string,
     content: string,
     messageId: string
-  ): Promise<Boolean | any> => {
+  ): Promise<void> => {
     try {
       const msg = await Message.findById(messageId);
       //TODO arreglar para que sea con ids
-      if (msg?.usernameFrom != username) return false;
+      if (msg?.usernameFrom != username) throw "Not your message";
       msg!.content = content;
       msg!.edited = true;
       await msg?.save();
-      return true;
+      return;
     } catch (err) {
-      return err;
+      logger.error(`error editing msg: ${JSON.stringify(err, null, 2)}`);
+      throw err;
     }
   },
 
   removeMessageInChat: async (
     username: string,
     messageId: string
-  ): Promise<Boolean | any> => {
+  ): Promise<void> => {
     try {
       const msg = await Message.findById(messageId);
-      if (msg?.usernameFrom != username) return false;
-      msg!.content = "";
+      if (msg?.usernameFrom != username) throw "Not your message";
+      // FIXME: da error si msg.content = "" porq content es required
+      msg!.content = "._.";
       msg!.deleted = true;
-      await msg?.save();
-      return false;
+      const res = await msg?.save();
+      logger.debug(`res: ${JSON.stringify(res, null, 2)}`);
+      return;
     } catch (err) {
-      return err;
+      logger.error(`error deleting msg: ${JSON.stringify(err, null, 2)}`);
+      throw err;
     }
   },
 
-  removeChat: async (
-    username: string,
-    chatId: string
-  ): Promise<Boolean | any> => {
+  removeChat: async (username: string, chatId: string): Promise<Boolean> => {
     try {
       const p1 = Message.deleteMany({ chatId: chatId });
       const chat = await Chat.findById(chatId);
@@ -115,7 +116,7 @@ const chatService = {
       await Promise.all([p1, p2, p3]);
       return true;
     } catch (err) {
-      return err;
+      throw err;
     }
   },
 };

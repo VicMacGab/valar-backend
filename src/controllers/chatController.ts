@@ -31,7 +31,7 @@ chatController.post("/chats", async (req: Request, res: Response) => {
     // TODO ver si es que yo tengo un chat con ese id
     // asi veo que es mio y poder detectar sapos
     const messages = await chatService.getMessagesForChat(chatId);
-    logger.info(`chat: ${JSON.stringify(messages, null, 2)}`);
+    // logger.info(`chat: ${JSON.stringify(messages, null, 2)}`);
     return res
       .status(200)
       .json({ chat: { messages, _id: chatId }, me: username });
@@ -58,13 +58,11 @@ chatController.put(
     const { valarSession } = req.signedCookies;
     const { username } = valarSession;
     const { content, messageId } = req.body;
+    logger.info(
+      `trying to edit message with id: ${messageId} and content: ${content}`
+    );
     try {
-      const possible = await chatService.editMessageInChat(
-        username,
-        content,
-        messageId
-      );
-      if (!possible) return res.status(403).json({ msg: MESSAGE.ERROR.NOTME });
+      await chatService.editMessageInChat(username, content, messageId);
       return res.status(200).json({ msg: MESSAGE.SUCCESS.EDITED });
     } catch (err) {
       return res.status(500).json({ msg: MESSAGE.ERROR.GENERIC });
@@ -78,12 +76,9 @@ chatController.put(
     const { valarSession } = req.signedCookies;
     const { username } = valarSession;
     const { messageId } = req.body;
+    logger.info(`trying to delete message with id ${messageId}`);
     try {
-      const possible = await chatService.removeMessageInChat(
-        username,
-        messageId
-      );
-      if (!possible) return res.status(403).json({ msg: MESSAGE.ERROR.NOTME });
+      await chatService.removeMessageInChat(username, messageId);
       return res.status(200).json({ msg: MESSAGE.SUCCESS.DELETED });
     } catch (err) {
       return res.status(500).json({ msg: MESSAGE.ERROR.GENERIC });
@@ -99,7 +94,8 @@ chatController.delete(
     const { chatId } = req.body;
     try {
       const possible = await chatService.removeChat(username, chatId);
-      if (!possible) return res.status(403).json({ msg: CHAT.ERROR.NOTME });
+      if (possible === false)
+        return res.status(403).json({ msg: CHAT.ERROR.NOTME });
       return res.status(200).json({ msg: CHAT.SUCCESS.DELETED });
     } catch (err) {
       return res.status(500).json({ msg: CHAT.ERROR.GENERIC });

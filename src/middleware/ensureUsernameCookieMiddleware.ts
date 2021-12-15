@@ -19,6 +19,7 @@ const ensureUsernameCookieMiddleware = async (
     logger.error(
       `tried to access protected ensureUsernameCookieMiddleware route from ip: ${req.ip}`
     );
+    logger.warn(`Origin: ${req.headers.origin}`);
     return res.status(403).json({ msg: MIDDLEWARE.NOT_ALLOWED });
   }
   next();

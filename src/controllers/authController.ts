@@ -83,7 +83,7 @@ authController.post("/auth/signup", async (req: Request, res: Response) => {
           { username: req.body.username },
           120
         );
-        randomInt(1000, 9999, async (err, num) => {
+        randomInt(MIN_AUTHCODE_NUM, MAX_AUTHCODE_NUM, async (err, num) => {
           if (err) {
             return res.status(500).json({ msg: USER.ERROR.GENERIC });
           }

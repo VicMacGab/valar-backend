@@ -23,6 +23,7 @@ const ensureLoggedInMiddleware = (
     logger.error(
       `tried to access protected ensureLoggedInMiddleware route from ip: ${req.ip}`
     );
+    logger.warn(`Origin: ${req.headers.origin}`);
     return res.status(403).json({ msg: USER.ERROR.NOT_LOGGED_IN });
   }
 

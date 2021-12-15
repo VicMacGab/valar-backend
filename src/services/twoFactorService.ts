@@ -30,7 +30,7 @@ class twoFactorService {
     try {
       await mailService.sendCode(email, code);
     } catch (error) {
-      return error;
+      throw error;
     }
 
     // setear el countdown
