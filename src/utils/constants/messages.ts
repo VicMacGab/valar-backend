@@ -7,6 +7,7 @@ export const USER = {
     LOGOUT: "Successfully logged out.",
     DECLINED: "Successfully declined request.",
     SENT: "Successfully sent request.",
+    REQUEST_ACCEPTED: "Accepted request.",
   },
   ERROR: {
     CREATION: "Error when creating user.",

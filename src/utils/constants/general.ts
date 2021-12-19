@@ -13,9 +13,11 @@ export const AUTH = {
 };
 
 export const REQUESTS = {
-  SEND_KEYS: ["username"],
+  SEND_KEYS: ["username", "pubKey", "p", "g"],
   ACCEPT_KEYS: ["username"],
   DECLINE_KEYS: ["username"],
+  SEND_PUB_PART_KEYS: ["friendUsername", "pubKey", "p", "g"],
+  FINISH_KEYS: ["friendUsername", "friendId"],
 };
 
 export const INVALID_BODY = "Invalid body";

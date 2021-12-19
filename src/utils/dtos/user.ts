@@ -3,14 +3,16 @@ import { ChatDTO } from "./chat";
 interface UserChat {
   chat: string | Partial<ChatDTO>;
   user: string | Partial<UserDTO>;
-  key: Buffer;
-  encrypted?: boolean;
   _id?: string;
 }
 
 interface OutgoingRequest {
   user: string | Partial<UserDTO>;
   _id?: string;
+  peerPublicPart: Buffer;
+  p: Buffer;
+  g: Buffer;
+  accepted: boolean;
 }
 
 interface IncomingRequest {

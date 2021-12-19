@@ -18,7 +18,7 @@ userController.get("/user/:username", async (req: Request, res: Response) => {
   }
   logger.info(`searching for username: ${username}`);
   try {
-    const [found] = await userService.findByUsername(username);
+    const [found] = await userService.findByUsername(username, "_id");
     if (found) {
       logger.info("user search", username);
       return res.status(200).json({ msg: USER.SUCCESS.FOUND, username });

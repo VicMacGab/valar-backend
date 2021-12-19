@@ -1,8 +1,6 @@
 import mongoose, { Model } from "mongoose";
 import { ChatDTO } from "../utils/dtos/chat";
 
-import MessageSchema from "./Message";
-
 // schema = los tipos de dato de cada fila
 // collection = tabla
 // document = tupla

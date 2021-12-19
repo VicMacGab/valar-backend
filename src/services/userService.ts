@@ -39,17 +39,13 @@ const userService = {
     });
   },
 
-  // FIXME: IMPORTANT
-  //TODO hacer proyeccion con un parametro
   findByUsername: (
-    username: string
+    username: string,
+    projection: string
   ): Promise<[boolean, MongooseUserQueryResult?]> => {
     return new Promise<[boolean, MongooseUserQueryResult?]>(
       (resolve, reject) => {
-        User.findOne(
-          { username: username },
-          "_id username verified password email outgoingRequests incomingRequests"
-        )
+        User.findOne({ username: username }, projection)
           .exec()
           .then((user: MongooseUserQueryResult) => {
             if (user) resolve([true, user]);
@@ -65,11 +61,8 @@ const userService = {
   ): Promise<[boolean, MongooseUserQueryResult?]> => {
     return new Promise<[boolean, MongooseUserQueryResult?]>(
       (resolve, reject) => {
-        User.findOne(
-          { username: username },
-          "outgoingRequests _id chats.encrypted"
-        )
-          .populate("outgoingRequests.user", "username")
+        User.findOne({ username: username }, "outgoingRequests _id")
+          .populate("outgoingRequests.user", "_id username")
           .exec()
           .then((user: MongooseUserQueryResult) => {
             if (user) resolve([true, user]);
@@ -85,11 +78,8 @@ const userService = {
   ): Promise<[boolean, MongooseUserQueryResult?]> => {
     return new Promise<[boolean, MongooseUserQueryResult?]>(
       (resolve, reject) => {
-        User.findOne(
-          { username: username },
-          "incomingRequests _id chats.encrypted"
-        )
-          .populate("incomingRequests.user", "username")
+        User.findOne({ username: username }, "incomingRequests _id")
+          .populate("incomingRequests.user", "_id username")
           .exec()
           .then((user: MongooseUserQueryResult) => {
             if (user) resolve([true, user]);
@@ -98,6 +88,18 @@ const userService = {
           .catch((err) => reject(err));
       }
     );
+  },
+
+  findChatWithFriend: async (username: string, friendsId: string) => {
+    try {
+      const friends = await User.findOne(
+        { username: username, "chats.user": { $eq: friendsId } },
+        "chats.chat"
+      ).exec();
+      return friends;
+    } catch (error) {
+      throw error;
+    }
   },
 
   findRequestConflict: async (
@@ -110,9 +112,11 @@ const userService = {
       const user = await User.findOne(
         {
           username: myUsername,
-          "incomingRequests.user": { $eq: friendsId },
-          "outgoingRequests.user": { $eq: friendsId },
-          "chats.user": { $eq: friendsId },
+          $or: [
+            { "incomingRequests.user": { $eq: friendsId } },
+            { "outgoingRequests.user": { $eq: friendsId } },
+            { "chats.user": { $eq: friendsId } },
+          ],
         },
         "_id"
       ).exec();

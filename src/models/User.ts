@@ -8,6 +8,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema<UserDTO>({
   username: { type: String, required: true, index: "hashed" },
   password: { type: String, required: true },
+  // TODO: el indice del mail esta porlas creo
   email: {
     type: String,
     required: true,
@@ -25,8 +26,6 @@ const UserSchema = new Schema<UserDTO>({
         type: Schema.Types.ObjectId,
         ref: "User",
       },
-      key: Schema.Types.Buffer,
-      encrypted: { type: Boolean, default: false },
     },
   ],
   outgoingRequests: [
@@ -35,6 +34,13 @@ const UserSchema = new Schema<UserDTO>({
         type: Schema.Types.ObjectId,
         ref: "User",
       },
+      accepted: {
+        type: Boolean,
+        default: false,
+      },
+      peerPublicPart: Schema.Types.Buffer, // g^b mod p
+      p: Schema.Types.Buffer,
+      g: Schema.Types.Buffer,
     },
   ],
   incomingRequests: [
@@ -42,7 +48,6 @@ const UserSchema = new Schema<UserDTO>({
       peerPublicPart: Schema.Types.Buffer, // g^a mod p
       p: Schema.Types.Buffer,
       g: Schema.Types.Buffer,
-      // g^b mod p
       user: {
         type: Schema.Types.ObjectId,
         ref: "User",
