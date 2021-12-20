@@ -49,7 +49,7 @@ api.use(
   cors({
     origin:
       process.env.NODE_ENV == "production"
-        ? "https://valar-frontend.vercel.app"
+        ? "https://www.cliffdev.com"
         : "http://localhost:3000",
     credentials: true,
   })
