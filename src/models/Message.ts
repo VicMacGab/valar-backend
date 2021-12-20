@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema<Partial<MessageDTO>>({
   content: {
-    type: Schema.Types.String,
+    type: Schema.Types.Buffer,
     required: true,
   },
   //TODO: username cambiar a id
@@ -24,6 +24,10 @@ const MessageSchema = new Schema<Partial<MessageDTO>>({
   timestamp: {
     type: Schema.Types.Date,
     default: () => Date.now(),
+  },
+  nonce: {
+    type: Schema.Types.Buffer,
+    required: true,
   },
   chatId: {
     type: Schema.Types.ObjectId,

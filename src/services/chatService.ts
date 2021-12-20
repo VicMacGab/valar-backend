@@ -38,7 +38,7 @@ const chatService = {
       //TODO optimizar lo de los mensajes
       const chat = await Message.find(
         { chatId: chatId },
-        "content usernameFrom edited deleted timestamp _id"
+        "content nonce usernameFrom edited deleted timestamp _id"
       );
       // logger.info(`${JSON.stringify(chat, null, 2)}`);
       return chat;
@@ -51,9 +51,9 @@ const chatService = {
     message: MessageDTO
   ): Promise<MongooseChatQueryResult | any> => {
     try {
-      logger.debug(`message: ${JSON.stringify(message, null, 2)}`);
+      // logger.debug(`message: ${JSON.stringify(message, null, 2)}`);
       const res = await Message.create(message);
-      logger.debug(`saved message res: ${JSON.stringify(res, null, 2)}`);
+      // logger.debug(`saved message res: ${JSON.stringify(res, null, 2)}`);
       return res;
     } catch (error) {
       throw error;
@@ -62,15 +62,17 @@ const chatService = {
 
   editMessageInChat: async (
     username: string,
-    content: string,
-    messageId: string
+    content: Uint8Array,
+    messageId: string,
+    nonce: Buffer
   ): Promise<void> => {
     try {
       const msg = await Message.findById(messageId);
       //TODO arreglar para que sea con ids
       if (msg?.usernameFrom != username) throw "Not your message";
-      msg!.content = content;
+      msg!.content = Buffer.from(content);
       msg!.edited = true;
+      msg!.nonce = nonce;
       await msg?.save();
       return;
     } catch (err) {
@@ -87,7 +89,7 @@ const chatService = {
       const msg = await Message.findById(messageId);
       if (msg?.usernameFrom != username) throw "Not your message";
       // FIXME: da error si msg.content = "" porq content es required
-      msg!.content = "._.";
+      msg!.content = Buffer.from("._.");
       msg!.deleted = true;
       const res = await msg?.save();
       logger.debug(`res: ${JSON.stringify(res, null, 2)}`);

@@ -117,7 +117,6 @@ io.use((socket, next) => {
 });
 
 // namespace = una conexión TCP
-// TODO: socket.io/admin para debuguear si es necesario
 io.on("connection", async (socket) => {
   logger.info(
     // @ts-ignore
@@ -142,17 +141,21 @@ io.on("connection", async (socket) => {
       editedMessage: EditedMessageDto,
       callback: (ack: EditedMessageAck) => void
     ) => {
+      logger.info(`emitting 'messageEdit' event...`);
       try {
+        // logger.debug(`edited msg: ${JSON.stringify(editedMessage, null, 2)}`);
         // @ts-ignore
         const username = socket.request.signedCookies.valarSession.username;
         await chatService.editMessageInChat(
           username,
           editedMessage.newContent,
-          editedMessage.msgId
+          editedMessage.msgId,
+          editedMessage.newNonce
         );
         socket.to(editedMessage.chatId).emit("peerMessageEdit", {
           msgId: editedMessage.msgId,
           newContent: editedMessage.newContent,
+          newNonce: editedMessage.newNonce,
           msgIdx: editedMessage.msgIdx,
         });
         callback({
@@ -172,6 +175,7 @@ io.on("connection", async (socket) => {
       deletedMessage: DeletedMessage,
       callback: (ack: DeletedMessageAck) => void
     ) => {
+      logger.info(`emitting 'messageDelete' event...`);
       try {
         // @ts-ignore
         const username = socket.request.signedCookies.valarSession.username;
@@ -195,19 +199,22 @@ io.on("connection", async (socket) => {
   socket.on(
     "message",
     async (msg: MessageDTO, callback: (ack: MessageAck) => void) => {
-      logger.debug(
-        `msg from ${
-          // @ts-ignore
-          socket.request.signedCookies.valarSession.username
-        }: ${JSON.stringify(msg, null, 2)}`
-      );
-      logger.debug(`sending msg ${msg.content} to room ${msg.chatId}`);
+      logger.info(`emitting 'message' event...`);
+      // logger.debug(
+      //   `msg from ${
+      //     // @ts-ignore
+      //     socket.request.signedCookies.valarSession.username
+      //   }: ${JSON.stringify(msg, null, 2)}`
+      // );
+      // logger.debug(`sending msg ${msg.content} to room ${msg.chatId}`);
 
       try {
         // TODO: mejorar
         const newMsg = await chatService.insertMessageToChat(msg);
+        // logger.debug(`new Msg: ${JSON.stringify(newMsg, null, 2)}`);
+        // logger.debug(`newMsg._id: ${newMsg._id}`);
         socket.to(msg.chatId).emit("message", {
-          _id: newMsg._id,
+          _id: newMsg._id.toString(),
           timestamp: newMsg.timestamp,
           ...msg,
         });

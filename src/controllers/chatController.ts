@@ -31,7 +31,7 @@ chatController.post("/chats", async (req: Request, res: Response) => {
     // TODO ver si es que yo tengo un chat con ese id
     // asi veo que es mio y poder detectar sapos
     const messages = await chatService.getMessagesForChat(chatId);
-    // logger.info(`chat: ${JSON.stringify(messages, null, 2)}`);
+    // logger.info(`messages: ${JSON.stringify(messages, null, 2)}`);
     return res
       .status(200)
       .json({ chat: { messages, _id: chatId }, me: username });
@@ -57,12 +57,12 @@ chatController.put(
   async (req: Request, res: Response) => {
     const { valarSession } = req.signedCookies;
     const { username } = valarSession;
-    const { content, messageId } = req.body;
+    const { content, messageId, nonce } = req.body;
     logger.info(
       `trying to edit message with id: ${messageId} and content: ${content}`
     );
     try {
-      await chatService.editMessageInChat(username, content, messageId);
+      await chatService.editMessageInChat(username, content, messageId, nonce);
       return res.status(200).json({ msg: MESSAGE.SUCCESS.EDITED });
     } catch (err) {
       return res.status(500).json({ msg: MESSAGE.ERROR.GENERIC });

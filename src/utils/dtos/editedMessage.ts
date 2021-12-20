@@ -1,6 +1,7 @@
 export interface EditedMessageDto {
   msgId: string;
-  newContent: string;
+  newContent: Buffer;
   chatId: string;
   msgIdx: number;
+  newNonce: Buffer;
 }
