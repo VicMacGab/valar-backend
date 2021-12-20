@@ -49,7 +49,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           source: "./package.json"
-          target: "/home/ubuntu/valar-backend/"
+          target: "/home/valar/valar-backend/"
       - name: Restart server
         uses: appleboy/ssh-action@master
         with:
