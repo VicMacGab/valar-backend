@@ -28,6 +28,8 @@ service and not the website in the user's address bar,
 this is considered a cross-site (or "third party") context.
 */
 
+// FIXME: le pusimos samesite 'none' porq el front y el back no tienen el mismo dominio (deberían para q sea más seguro)
+
 export const COOKIE_OPTIONS_2FACTOR: CookieOptions = {
   httpOnly: true, // document.cookie no puede acceder a ella
   secure: true, //  solo se manda por HTTPS a menos que sea localhost
@@ -42,7 +44,7 @@ export const COOKIE_OPTIONS_SESSION: CookieOptions = {
   secure: true,
   signed: true,
   // no maxAge por ahora
-  sameSite: "none", // TODO: evaluar las vulnerabilidades de esto
+  sameSite: "none",
   // domain: process.env.NODE_ENV == "production" ? "valar.com" : "localhost",
   // path: "/",
 };
