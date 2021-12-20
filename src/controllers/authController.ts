@@ -243,7 +243,7 @@ authController.get(
       if (codesMatched) {
         return res
           .status(202)
-          .clearCookie("username")
+          .clearCookie("username", COOKIE_OPTIONS_2FACTOR)
           .cookie(
             "valarSession",
             JSON.stringify({ username: decodedJWT.username }),
@@ -283,7 +283,7 @@ authController.post(
     );
     return res
       .status(202)
-      .clearCookie("valarSession")
+      .clearCookie("valarSession", COOKIE_OPTIONS_SESSION)
       .json({ msg: USER.SUCCESS.LOGOUT });
   }
 );
