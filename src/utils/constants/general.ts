@@ -34,19 +34,18 @@ export const COOKIE_OPTIONS_2FACTOR: CookieOptions = {
   httpOnly: true, // document.cookie no puede acceder a ella
   secure: true, //  solo se manda por HTTPS a menos que sea localhost
   maxAge: 120 * 1000, //  no son exactamente 2 minutos, pero por ahí
-  sameSite: "none",
-  // domain: process.env.NODE_ENV == "production" ? "valar.com" : "localhost",
-  // path: "/",
+  sameSite: "strict",
+  domain: process.env.NODE_ENV == "production" ? "cliffdev.com" : "localhost",
+  path: "/",
 };
 
 export const COOKIE_OPTIONS_SESSION: CookieOptions = {
   httpOnly: true,
   secure: true,
   signed: true,
-  // no maxAge por ahora
-  sameSite: "none",
-  // domain: process.env.NODE_ENV == "production" ? "valar.com" : "localhost",
-  // path: "/",
+  sameSite: "lax",
+  domain: process.env.NODE_ENV == "production" ? "cliffdev.com" : "localhost",
+  path: "/",
 };
 
 export const MIN_AUTHCODE_NUM = 1000;
