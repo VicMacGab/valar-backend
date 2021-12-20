@@ -187,10 +187,6 @@ requestController.put(
         chat: chat._id,
         user: userReceivingPubKey!._id,
       });
-      userReceivingPubKey!.chats!.push({
-        chat: chat._id,
-        user: userSendingPubKey!._id,
-      });
 
       logger.debug(`created chat for both peers`);
 
@@ -263,7 +259,7 @@ requestController.put(
     try {
       const [, me] = await userService.findByUsername(
         username,
-        "username outgoingRequests"
+        "_id username outgoingRequests chats"
       );
 
       logger.debug(`user outgoingRequests: ${JSON.stringify(me, null, 2)}`);
@@ -278,12 +274,21 @@ requestController.put(
 
       me!.outgoingRequests!.id(outgoingRequest!._id).remove();
 
-      const p3 = userService.findChatWithFriend(
-        me!.username,
-        req.body.friendId
-      );
+      logger.debug(`friendUsername: ${req.body.friendUsername}`);
 
-      const [user] = await Promise.all([p3, me?.save()]);
+      const user = await userService.findChatWithFriend(
+        req.body.friendUsername,
+        me!._id
+      );
+      logger.debug(`findChatWithFriend: ${JSON.stringify(user, null, 2)}`);
+
+      me!.chats!.push({
+        // @ts-ignore
+        chat: user?.chats[0].chat,
+        user: req.body.friendId,
+      });
+
+      await me?.save();
 
       logger.info(`deleted outgoing request because got accepted`);
 
