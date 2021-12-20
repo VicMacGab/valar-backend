@@ -26,7 +26,7 @@ chatController.post("/chats", async (req: Request, res: Response) => {
   const { valarSession } = req.signedCookies;
   const { username } = valarSession;
   const { chatId } = req.body;
-  logger.debug(`chatId: ${chatId}`);
+  // logger.debug(`chatId: ${chatId}`);
   try {
     // TODO ver si es que yo tengo un chat con ese id
     // asi veo que es mio y poder detectar sapos
