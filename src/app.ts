@@ -71,7 +71,7 @@ api.use(
 api.use(cookieParser(process.env.COOKIES_SECRET));
 
 api.get("/api", (req: Request, res: Response) => {
-  return res.status(418).json("Soy un teapot.");
+  return res.status(418).json("Soy un teapot v2.");
 });
 
 api.use("/api", helloController);

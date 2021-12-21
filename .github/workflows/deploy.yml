@@ -40,9 +40,10 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          source: "./dist/*"
+          source: "./dist/"
           target: "/home/valar/valar-backend/dist/"
-      - name: Copy dist folder to server
+          overwrite: true
+      - name: Copy package.json to server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -50,6 +51,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           source: "./package.json"
           target: "/home/valar/valar-backend/"
+          overwrite: true
       - name: Restart server
         uses: appleboy/ssh-action@master
         with:
